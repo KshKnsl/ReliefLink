@@ -1,0 +1,6 @@
+1|Community Center|Random Address|159|19|1|1|1|
+2|High School Gym|Random Address|121|18|1|1|1|
+3|City Park Shelter|Random Address|172|48|1|1|1|
+4|Convention Center|Random Address|106|56|1|1|1|
+5|Stadium|Random Address|113|40|1|1|1|
+6|Local Church|Random Address|50|28|1|1|1|
