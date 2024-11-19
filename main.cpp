@@ -84,7 +84,7 @@ struct Disaster
     vector<string> requiredResources;
 };
 
-ostream &operator<<(ostream &os, const Location &loc)
+ostream &operator<<(ostream &os, Location &loc)
 {
     os << loc.address << ", " << loc.city << ", " << loc.state << " (" << loc.latitude << ", " << loc.longitude << ")";
     return os;
@@ -118,13 +118,13 @@ struct Graph
 {
     map<string, vector<pair<string, double>>> adjList;
 
-    void addEdge(const string &src, const string &dest, double weight)
+    void addEdge(string &src, string &dest, double weight)
     {
         adjList[src].push_back(make_pair(dest, weight));
         adjList[dest].push_back(make_pair(src, weight));
     }
 
-    void dijkstra(const string &start)
+    void dijkstra(string &start)
     {
         map<string, double> dist;
         for (auto &node : adjList)
@@ -201,7 +201,7 @@ private:
         vector<pair<string, string>> cities = {
             {"New York", "NY"}, {"Los Angeles", "CA"}, {"Chicago", "IL"}, {"Houston", "TX"}, {"Phoenix", "AZ"}, {"Philadelphia", "PA"}, {"San Antonio", "TX"}, {"San Diego", "CA"}, {"Dallas", "TX"}, {"San Jose", "CA"}};
 
-        for (const auto &city : cities)
+        for (auto &city : cities)
         {
             file << city.first << "|" << city.second << "|"
                  << (30.0 + (rand() % 20)) << "|"
@@ -230,7 +230,7 @@ private:
             {"Mobile Command Center", "command"}};
 
         int id = 1;
-        for (const auto &eq : equipment)
+        for (auto &eq : equipment)
         {
             file << id++ << "|" << eq.first << "|" << eq.second << "|"
                  << "1|"
@@ -254,7 +254,7 @@ private:
             "Orthopedic", "Neurological", "Respiratory", "General Surgery"};
 
         int id = 1;
-        for (const auto &name : hospitalNames)
+        for (auto &name : hospitalNames)
         {
             file << id++ << "|" << name << "|"
                  << "City Location|"
@@ -286,7 +286,7 @@ private:
             "Construction", "Surveillance"};
 
         int id = 1;
-        for (const auto &name : teamNames)
+        for (auto &name : teamNames)
         {
             file << id++ << "|" << name << "|"
                  << "Random Location|"
@@ -305,7 +305,7 @@ private:
             "Convention Center", "Stadium", "Local Church"};
 
         int id = 1;
-        for (const auto &name : shelterNames)
+        for (auto &name : shelterNames)
         {
             file << id++ << "|" << name << "|"
                  << "Random Address|"
@@ -368,7 +368,7 @@ private:
     void saveUsers()
     {
         ofstream file("users.txt");
-        for (const auto &user : users)
+        for (auto &user : users)
         {
             file << user.first << "|" << user.second << "\n";
         }
@@ -408,9 +408,9 @@ private:
     void saveCities()
     {
         ofstream file("cities.txt");
-        for (const auto &city : cities)
+        for (auto &city : cities)
         {
-            const auto &c = city.second;
+            auto &c = city.second;
             file << c.name << "|" << c.state << "|"
                  << fixed << setprecision(6) << c.latitude << "|"
                  << fixed << setprecision(6) << c.longitude << "|"
@@ -450,7 +450,7 @@ private:
     void saveEquipment()
     {
         ofstream file("equipment.txt");
-        for (const auto &eq : equipment)
+        for (auto &eq : equipment)
         {
             file << eq.second.id << "|" << eq.second.name << "|" << eq.second.type << "|"
                  << (eq.second.isAvailable ? 1 : 0) << "|"
@@ -549,7 +549,7 @@ private:
         }
 
         cout << "Disasters Reported:" << endl;
-        for (const auto &disaster : disasters)
+        for (auto &disaster : disasters)
         {
             cout << "ID: " << disaster.second.id << ", Type: " << disaster.second.type
                  << ", Status: " << disaster.second.status << ", Severity: " << disaster.second.severity
@@ -625,9 +625,9 @@ private:
     {
         cout << "\nHospitals and Shelters Overview:" << endl;
         cout << "Hospitals:" << endl;
-        for (const auto &city : cities)
+        for (auto &city : cities)
         {
-            for (const auto &hospital : city.second.hospitals)
+            for (auto &hospital : city.second.hospitals)
             {
                 cout << "ID: " << hospital.id << ", Name: " << hospital.name
                      << ", Location: " << hospital.location << ", Available Beds: " << hospital.availableBeds << endl;
@@ -635,7 +635,7 @@ private:
         }
 
         cout << "\nShelters:" << endl;
-        for (const auto &shelter : shelters)
+        for (auto &shelter : shelters)
         {
             cout << "ID: " << shelter.second.id << ", Name: " << shelter.second.name
                  << ", Location: " << shelter.second.location << ", Current Occupancy: " << shelter.second.currentOccupancy << endl;
@@ -724,9 +724,116 @@ public:
     }
 };
 
+class TrieNode
+{
+public:
+    unordered_map<char, TrieNode *> children;
+    bool isEndOfWord;
+    int id;
+    TrieNode() : isEndOfWord(false) {}
+};
+class Trie
+{
+private:
+    TrieNode *root;
+    void dfsHelper(TrieNode *node, string prefix, vector<string> &results)
+    {
+        if (node->isEndOfWord)
+            results.push_back(prefix);
+
+        for (auto &pair : node->children)
+        {
+            prefix.push_back(pair.first);
+            dfsHelper(pair.second, prefix, results);
+            prefix.pop_back();
+        }
+    }
+public:
+    Trie() : root(new TrieNode()) {}
+    void insert(string word)
+    {
+        TrieNode *current = root;
+        for (char c : word)
+        {
+            if (current->children.find(c) == current->children.end())
+                current->children[c] = new TrieNode();
+            current = current->children[c];
+        }
+        current->isEndOfWord = true;
+    }
+    bool search(string word)
+    {
+        TrieNode *node = findNode(word);
+        return node != NULL && node->isEndOfWord;
+    }
+    bool startsWith(string prefix)
+    {
+        return findNode(prefix) != NULL;
+    }
+    vector<string> autocomplete(string prefix)
+    {
+        vector<string> results;
+        TrieNode *node = findNode(prefix);
+        if (node)
+        {
+            string current = prefix;
+            dfsHelper(node, current, results);
+        }
+        return results;
+    }
+
+    void insertBulk(string data)
+    {
+        int start = 0, end = 0;
+        while ((end = data.find(',', start)) != string::npos)
+        {
+            insert(data.substr(start, end - start));
+            start = end + 1;
+        }
+        if (start < data.length())
+        {
+            insert(data.substr(start));
+        }
+    }
+
+private:
+    TrieNode *findNode(string prefix)
+    {
+        TrieNode *current = root;
+        for (char c : prefix)
+        {
+            if (current->children.find(c) == current->children.end())
+            {
+                return NULL;
+            }
+            current = current->children[c];
+        }
+        return current;
+    }
+};
+
+
 int main()
 {
+    Trie trie;
+    trie.insertBulk("New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose");
+    cout << "Search 'Chicago': " << (trie.search("Chicago") ? "Found" : "Not Found") << endl;
+    cout << "Search 'Miami': " << (trie.search("Miami") ? "Found" : "Not Found") << endl;
+    cout << "Starts with 'San': " << (trie.startsWith("San") ? "Yes" : "No") << endl;
+    cout << "Starts with 'Bos': " << (trie.startsWith("Bos") ? "Yes" : "No") << endl;
+    cout << "Autocomplete 'San':" << endl;
+    vector<string> results = trie.autocomplete("San");
+    for (string &result : results)
+    {
+        cout << "  " << result << endl;
+    }
+
     DisasterManagementSystem dms;
     dms.run();
     return 0;
 }
+
+
+
+
+

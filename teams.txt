@@ -1,6 +1,0 @@
-1|Rescue Squad A|Random Location|1|Construction|7
-2|Medical Unit B|Random Location|1|Water Rescue|9
-3|Fire Brigade C|Random Location|1|Medical|10
-4|Search Team D|Random Location|1|Medical|4
-5|Water Rescue E|Random Location|1|Water Rescue|10
-6|Helicopter Support F|Random Location|1|Surveillance|10
