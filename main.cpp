@@ -1035,6 +1035,104 @@ public:
     }
 };
 
+class Alert {
+private:    
+    int AlertID;    
+    int DisasterID;    
+    int Severity;    
+    string Message;    
+    string Time;
+public:    
+    Alert(int alertID, int disasterID, int severity, string message, string time) {        
+        AlertID = alertID;        
+        DisasterID = disasterID;        
+        Severity = severity;        
+        Message = message;        
+        Time = time;    
+    }
+    
+    int getSeverity() const { return Severity; }    
+    string getMessage() const { return Message; }    
+    string getTime() const { return Time; }    
+    int getAlertID() const { return AlertID; }
+    
+    friend ostream &operator<<(ostream &os, const Alert &alert) {        
+        os << "AlertID: " << alert.AlertID            
+           << ", DisasterID: " << alert.DisasterID            
+           << ", Severity: " << alert.Severity            
+           << ", Message: " << alert.Message            
+           << ", Time: " << alert.Time;        
+        return os;    
+    }
+};
+
+class MaxHeap {
+private:    
+    vector<Alert> heap;
+    
+    int parent(int index) { return (index - 1) / 2; }    
+    int leftChild(int index) { return 2 * index + 1; }    
+    int rightChild(int index) { return 2 * index + 2; }
+    
+    void heapifyUp(int index) {        
+        while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity()) {            
+            swap(heap[index], heap[parent(index)]);            
+            index = parent(index);        
+        }    
+    }
+    
+    void heapifyDown(int index) {        
+        int largest = index;        
+        int left = leftChild(index);        
+        int right = rightChild(index);
+        
+        if (left < heap.size() && heap[left].getSeverity() > heap[largest].getSeverity())            
+            largest = left;
+        
+        if (right < heap.size() && heap[right].getSeverity() > heap[largest].getSeverity())            
+            largest = right;
+        
+        if (largest != index) {            
+            swap(heap[index], heap[largest]);            
+            heapifyDown(largest);        
+        }    
+    }
+public:    
+    void insert(const Alert &alert) {        
+        heap.push_back(alert);        
+        heapifyUp(heap.size() - 1);    
+    }
+    
+    Alert extractMax() {        
+        if (heap.empty())            
+            throw runtime_error("Heap is empty!");
+        
+        Alert maxAlert = heap[0];        
+        heap[0] = heap.back();        
+        heap.pop_back();        
+        heapifyDown(0);        
+        return maxAlert;    
+    }
+    
+    Alert getMax() const {        
+        if (heap.empty())            
+            throw runtime_error("Heap is empty!");        
+        return heap[0];    
+    }
+    
+    bool isEmpty() const {        
+        return heap.empty();    
+    }
+    
+    void displayHeap() const {        
+        for (const Alert &alert : heap) {            
+            cout << alert << endl;        
+        }    
+    }
+};
+
+
+
 class TrieNode
 {
 public:
@@ -1141,10 +1239,27 @@ int main()
 
     DisasterManagementSystem dms;
     dms.run();
+
+
+    MaxHeap alertHeap;
+    
+    alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));    
+    alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));    
+    alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));    
+    alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
+    
+    cout << "Alerts in Max-Heap:" << endl;    
+    alertHeap.displayHeap();    
+    cout << endl;
+    
+    cout << "Processing Alerts by Priority:" << endl;    
+    while (!alertHeap.isEmpty()) {        
+        Alert alert = alertHeap.extractMax();        
+        cout << "Processing: " << alert << endl;    
+    }
+    
     return 0;
 }
-
-
 
 
 
