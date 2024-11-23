@@ -6,7 +6,6 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include <conio.h>
 #include <iomanip>
 #include <ctime>
 #include <algorithm>
@@ -97,6 +96,8 @@ public:
     friend class Disaster;
     template <typename T>
     friend class BPlusTree;
+    friend class DisasterManagementSystem;
+    friend ostream &operator<<(ostream &os, Location &loc);
 };
 
 class Disaster {
@@ -130,6 +131,7 @@ public:
     }
     template <typename T>
     friend class BPlusTree;
+    friend class DisasterManagementSystem;
 };
 
 ostream &operator<<(ostream &os, Location &loc)
