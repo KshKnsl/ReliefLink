@@ -1,22 +1,5 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <queue>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <iomanip>
-#include <ctime>
-#include <algorithm>
-#include <thread>
-#include <stack>
-#include <list>
-#include <set>
-#include <unordered_map>
-#include <climits>
-#include<cmath>
-
+#include <bits/stdc++.h>
+#include <unistd.h>
 using namespace std;
 
 #define RESET "\033[0m"
@@ -26,6 +9,42 @@ using namespace std;
 #define BLUE "\033[34m"
 #define MAGENTA "\033[35m"
 #define CYAN "\033[36m"
+void changeColor()
+{
+    cout << "\033[2J\033[1;1H";
+    const string colors[] = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8A", "8B", "8C", "8D", "8E", "8F"};
+    srand(time(0));
+    int randomIndex = rand() % (sizeof(colors) / sizeof(colors[0]));
+    system(("color " + colors[randomIndex]).c_str());
+}
+void animatePrint(const string &filename)
+{
+    changeColor();
+    ifstream file(filename);
+    string line;
+    vector<string> lines;
+    while (getline(file, line))
+        lines.push_back(line);
+    size_t maxLength = 0;
+    for (const auto &l : lines)
+        maxLength = max(maxLength, l.length());
+    for (size_t i = 0; i < maxLength; ++i)
+    {
+        cout << "\033[2J\033[1;1H";
+        for (size_t j = 0; j < lines.size(); ++j)
+        {
+            if (i < lines[j].length())
+                cout << lines[j].substr(0, i + 1);
+            else
+                cout << lines[j].substr(0, lines[j].length());
+            cout << endl;
+        }
+        cout << endl;
+        usleep(25000);
+    }
+    sleep(1);
+    file.close();
+}
 
 struct Equipment
 {
@@ -62,8 +81,8 @@ struct City
     int emergencyVehicles;
 };
 
-
-class Location {
+class Location
+{
 private:
     double latitude;
     double longitude;
@@ -76,16 +95,18 @@ public:
     Location() : latitude(0.0), longitude(0.0), address(""), city(""), state("") {}
 
     // Parameterized Constructor
-    Location(double latitude, double longitude, const string& address, const string& city, const string& state)
+    Location(double latitude, double longitude, const string &address, const string &city, const string &state)
         : latitude(latitude), longitude(longitude), address(address), city(city), state(state) {}
 
     // Copy Constructor
-    Location(const Location& other)
+    Location(const Location &other)
         : latitude(other.latitude), longitude(other.longitude), address(other.address), city(other.city), state(other.state) {}
-    
+
     // Overloaded Assignment Operator
-    Location& operator=(const Location& other) {
-        if (this != &other) {
+    Location &operator=(const Location &other)
+    {
+        if (this != &other)
+        {
             latitude = other.latitude;
             longitude = other.longitude;
             address = other.address;
@@ -101,7 +122,8 @@ public:
     friend ostream &operator<<(ostream &os, Location &loc);
 };
 
-class Disaster {
+class Disaster
+{
 private:
     int id;
     string type;
@@ -112,23 +134,25 @@ private:
     int affectedPopulation;
     vector<int> assignedTeams;
     vector<string> requiredResources;
-public:
 
+public:
     // Constructor for convenience
-    Disaster(){}
-    Disaster(int id, const string& type, const Location& location, int severity,
-             const string& status, const string& date, int affectedPopulation,
-             const vector<int>& assignedTeams, const vector<string>& requiredResources)
+    Disaster() {}
+    Disaster(int id, const string &type, const Location &location, int severity,
+             const string &status, const string &date, int affectedPopulation,
+             const vector<int> &assignedTeams, const vector<string> &requiredResources)
         : id(id), type(type), location(location), severity(severity),
           status(status), date(date), affectedPopulation(affectedPopulation),
           assignedTeams(assignedTeams), requiredResources(requiredResources) {}
 
     // Comparison operator for ordering (based on id as an example)
-    bool operator<(const Disaster& other) const {
+    bool operator<(const Disaster &other) const
+    {
         return id < other.id;
     }
 
-    bool operator==(const Disaster& other) const {
+    bool operator==(const Disaster &other) const
+    {
         return id == other.id;
     }
     template <typename T>
@@ -165,269 +189,312 @@ struct Shelter
     bool hasPower;
     vector<string> facilities;
 };
-
-
-template <typename T> class BPlusTree{
+template <typename T>
+class BPlusTree
+{
 public:
-    class Node {
+    class Node
+    {
     private:
         bool isLeaf;
         vector<T> keys;
-        vector<Node*> children;
-        Node* next;
+        vector<Node *> children;
+        Node *next;
 
     public:
         // Constructor
         Node(bool leaf = false) : isLeaf(leaf), next(nullptr) {}
         friend class BPlusTree<T>;
     };
-    
-    Node* root;
+
+    Node *root;
     int t;
-    void splitChild(Node* parent, int index, Node* child);
-    void insertNonFull(Node* node, T key);
-    void remove(Node* node, T key);
-    void borrowFromPrev(Node* node, int index);
-    void borrowFromNext(Node* node, int index);
-    void merge(Node* node, int index);
-    void printTree(Node* node, int level);
-    
+    void splitChild(Node *parent, int index, Node *child);
+    void insertNonFull(Node *node, T key);
+    void remove(Node *node, T key);
+    void borrowFromPrev(Node *node, int index);
+    void borrowFromNext(Node *node, int index);
+    void merge(Node *node, int index);
+    void printTree(Node *node, int level);
+
 public:
-    BPlusTree(int degree): root(nullptr), t(degree){}
-    
+    BPlusTree(int degree) : root(nullptr), t(degree) {}
+
     void insert(T key);
     bool search(T key);
     void remove(T key);
     void printTree();
-};
 
-template <typename T>
-void BPlusTree<T>::splitChild(Node* parent, int index,Node* child){
-    Node* newChild = new Node(child->isLeaf);
-    parent->children.insert(parent->children.begin() + index + 1, newChild);
-    parent->keys.insert(parent->keys.begin() + index,child->keys[t - 1]);
-    
-    newChild->keys.assign(child->keys.begin() + t,child->keys.end());
-    child->keys.resize(t - 1);
-    
-    if (!child->isLeaf) {
-        newChild->children.assign(child->children.begin()+ t,child->children.end());
-        child->children.resize(t);
-    }
-    
-    if (child->isLeaf) {
-        newChild->next = child->next;
-        child->next = newChild;
-    }
-}
+    template <typename T>
+    void splitChild(Node *parent, int index, Node *child)
+    {
+        Node *newChild = new Node(child->isLeaf);
+        parent->children.insert(parent->children.begin() + index + 1, newChild);
+        parent->keys.insert(parent->keys.begin() + index, child->keys[t - 1]);
 
-// Implementation of insertNonFull function
-template <typename T>
-void BPlusTree<T>::insertNonFull(Node* node, T key)
-{
-    if (node->isLeaf) {
-        node->keys.insert(upper_bound(node->keys.begin(),node->keys.end(),key),key);
-    }
-    else {
-        int i = node->keys.size() - 1;
-        while (i >= 0 && key < node->keys[i]) {
-            i--;
+        newChild->keys.assign(child->keys.begin() + t, child->keys.end());
+        child->keys.resize(t - 1);
+
+        if (!child->isLeaf)
+        {
+            newChild->children.assign(child->children.begin() + t, child->children.end());
+            child->children.resize(t);
         }
-        i++;
-        if (node->children[i]->keys.size() == 2 * t - 1) {
-            splitChild(node, i, node->children[i]);
-            if (key > node->keys[i]) {
-                i++;
+
+        if (child->isLeaf)
+        {
+            newChild->next = child->next;
+            child->next = newChild;
+        }
+    }
+
+    // Implementation of insertNonFull function
+    template <typename T>
+    void insertNonFull(Node *node, T key)
+    {
+        if (node->isLeaf)
+        {
+            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key), key);
+        }
+        else
+        {
+            int i = node->keys.size() - 1;
+            while (i >= 0 && key < node->keys[i])
+            {
+                i--;
             }
-        }
-        insertNonFull(node->children[i], key);
-    }
-}
-
-// Implementation of remove function
-template <typename T>
-void BPlusTree<T>::remove(Node* node, T key)
-{
-    // If node is a leaf
-    if (node->isLeaf) {
-        auto it = find(node->keys.begin(), node->keys.end(),key);
-        if (it != node->keys.end()) {
-            node->keys.erase(it);
-        }
-    }
-    else {
-        int idx = lower_bound(node->keys.begin(),node->keys.end(), key)- node->keys.begin();
-        if (idx < node->keys.size()
-            && node->keys[idx] == key) {
-            if (node->children[idx]->keys.size() >= t) {
-                Node* predNode = node->children[idx];
-                while (!predNode->isLeaf) {
-                    predNode = predNode->children.back();
+            i++;
+            if (node->children[i]->keys.size() == 2 * t - 1)
+            {
+                splitChild(node, i, node->children[i]);
+                if (key > node->keys[i])
+                {
+                    i++;
                 }
-                T pred = predNode->keys.back();
-                node->keys[idx] = pred;
-                remove(node->children[idx], pred);
             }
-            else if (node->children[idx + 1]->keys.size()>= t) {
-                Node* succNode = node->children[idx + 1];
-                while (!succNode->isLeaf) {
-                    succNode = succNode->children.front();
+            insertNonFull(node->children[i], key);
+        }
+    }
+
+    // Implementation of remove function
+    template <typename T>
+    void remove(Node *node, T key)
+    {
+        // If node is a leaf
+        if (node->isLeaf)
+        {
+            auto it = find(node->keys.begin(), node->keys.end(), key);
+            if (it != node->keys.end())
+            {
+                node->keys.erase(it);
+            }
+        }
+        else
+        {
+            int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
+            if (idx < node->keys.size() && node->keys[idx] == key)
+            {
+                if (node->children[idx]->keys.size() >= t)
+                {
+                    Node *predNode = node->children[idx];
+                    while (!predNode->isLeaf)
+                    {
+                        predNode = predNode->children.back();
+                    }
+                    T pred = predNode->keys.back();
+                    node->keys[idx] = pred;
+                    remove(node->children[idx], pred);
                 }
-                T succ = succNode->keys.front();
-                node->keys[idx] = succ;
-                remove(node->children[idx + 1], succ);
+                else if (node->children[idx + 1]->keys.size() >= t)
+                {
+                    Node *succNode = node->children[idx + 1];
+                    while (!succNode->isLeaf)
+                    {
+                        succNode = succNode->children.front();
+                    }
+                    T succ = succNode->keys.front();
+                    node->keys[idx] = succ;
+                    remove(node->children[idx + 1], succ);
+                }
+                else
+                {
+                    merge(node, idx);
+                    remove(node->children[idx], key);
+                }
             }
-            else {
-                merge(node, idx);
+            else
+            {
+                if (node->children[idx]->keys.size() < t)
+                {
+                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t)
+                    {
+                        borrowFromPrev(node, idx);
+                    }
+                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t)
+                    {
+                        borrowFromNext(node, idx);
+                    }
+                    else
+                    {
+                        if (idx < node->children.size() - 1)
+                        {
+                            merge(node, idx);
+                        }
+                        else
+                        {
+                            merge(node, idx - 1);
+                        }
+                    }
+                }
                 remove(node->children[idx], key);
             }
         }
-        else {
-            if (node->children[idx]->keys.size() < t) {
-                if (idx > 0&& node->children[idx - 1]->keys.size()>= t) {
-                    borrowFromPrev(node, idx);
-                }
-                else if (idx < node->children.size() - 1&& node->children[idx + 1]->keys.size()>= t) {
-                    borrowFromNext(node, idx);
-                }
-                else {
-                    if (idx < node->children.size() - 1) {
-                        merge(node, idx);
-                    }
-                    else {
-                        merge(node, idx - 1);
-                    }
-                }
+    }
+
+    // Implementation of borrowFromPrev function
+    template <typename T>
+    void borrowFromPrev(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index - 1];
+
+        child->keys.insert(child->keys.begin(), node->keys[index - 1]);
+        node->keys[index - 1] = sibling->keys.back();
+        sibling->keys.pop_back();
+
+        if (!child->isLeaf)
+        {
+            child->children.insert(child->children.begin(), sibling->children.back());
+            sibling->children.pop_back();
+        }
+    }
+
+    // Implementation of borrowFromNext function
+    template <typename T>
+    void borrowFromNext(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index + 1];
+
+        child->keys.push_back(node->keys[index]);
+        node->keys[index] = sibling->keys.front();
+        sibling->keys.erase(sibling->keys.begin());
+
+        if (!child->isLeaf)
+        {
+            child->children.push_back(sibling->children.front());
+            sibling->children.erase(sibling->children.begin());
+        }
+    }
+
+    // Implementation of merge function
+    template <typename T>
+    void merge(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index + 1];
+
+        child->keys.push_back(node->keys[index]);
+        child->keys.insert(child->keys.end(), sibling->keys.begin(), sibling->keys.end());
+        if (!child->isLeaf)
+        {
+            child->children.insert(child->children.end(), sibling->children.begin(), sibling->children.end());
+        }
+
+        node->keys.erase(node->keys.begin() + index);
+        node->children.erase(node->children.begin() + index + 1);
+
+        delete sibling;
+    }
+
+    // Implementation of printTree function
+    template <typename T>
+    void printTree(Node *node, int level)
+    {
+        if (node != nullptr)
+        {
+            for (const T &key : node->keys)
+            {
+                cout << key << " ";
             }
-            remove(node->children[idx], key);
+            for (Node *child : node->children)
+            {
+                printTree(child, level + 1);
+            }
         }
     }
-}
 
-// Implementation of borrowFromPrev function
-template <typename T>
-void BPlusTree<T>::borrowFromPrev(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index - 1];
-    
-    child->keys.insert(child->keys.begin(),node->keys[index - 1]);
-    node->keys[index - 1] = sibling->keys.back();
-    sibling->keys.pop_back();
-    
-    if (!child->isLeaf) {
-        child->children.insert(child->children.begin(),sibling->children.back());
-        sibling->children.pop_back();
+    // Implementation of printTree wrapper function
+    template <typename T>
+    void printTree()
+    {
+        printTree(root, 0);
     }
-}
 
-// Implementation of borrowFromNext function
-template <typename T>
-void BPlusTree<T>::borrowFromNext(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index + 1];
-    
-    child->keys.push_back(node->keys[index]);
-    node->keys[index] = sibling->keys.front();
-    sibling->keys.erase(sibling->keys.begin());
-    
-    if (!child->isLeaf) {
-        child->children.push_back(sibling->children.front());
-        sibling->children.erase(sibling->children.begin());
-    }
-}
-
-// Implementation of merge function
-template <typename T>
-void BPlusTree<T>::merge(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index + 1];
-    
-    child->keys.push_back(node->keys[index]);
-    child->keys.insert(child->keys.end(),sibling->keys.begin(),sibling->keys.end());
-    if (!child->isLeaf) {
-        child->children.insert(child->children.end(),sibling->children.begin(),sibling->children.end());
-    }
-    
-    node->keys.erase(node->keys.begin() + index);
-    node->children.erase(node->children.begin() + index+ 1);
-    
-    delete sibling;
-}
-
-// Implementation of printTree function
-template <typename T>
-void BPlusTree<T>::printTree(Node* node, int level)
-{
-    if (node != nullptr) {
-        for (const T& key : node->keys) {
-            cout << key << " ";
+    // Implementation of search function
+    template <typename T>
+    bool search(T key)
+    {
+        Node *current = root;
+        while (current != nullptr)
+        {
+            int i = 0;
+            while (i < current->keys.size() && key > current->keys[i])
+            {
+                i++;
+            }
+            if (i < current->keys.size() && key == current->keys[i])
+            {
+                return true;
+            }
+            if (current->isLeaf)
+            {
+                return false;
+            }
+            current = current->children[i];
         }
-        for (Node* child : node->children) {
-            printTree(child, level + 1);
+        return false;
+    }
+
+    // Implementation of insert function
+    template <typename T>
+    void insert(T key)
+    {
+        if (root == nullptr)
+        {
+            root = new Node(true);
+            root->keys.push_back(key);
+        }
+        else
+        {
+            if (root->keys.size() == 2 * t - 1)
+            {
+                Node *newRoot = new Node();
+                newRoot->children.push_back(root);
+                splitChild(newRoot, 0, root);
+                root = newRoot;
+            }
+            insertNonFull(root, key);
         }
     }
-}
 
-// Implementation of printTree wrapper function
-template <typename T> void BPlusTree<T>::printTree()
-{
-    printTree(root, 0);
-}
-
-// Implementation of search function
-template <typename T> bool BPlusTree<T>::search(T key)
-{
-    Node* current = root;
-    while (current != nullptr) {
-        int i = 0;
-        while (i < current->keys.size()&& key > current->keys[i]) {
-            i++;
+    // Implementation of remove function
+    template <typename T>
+    void remove(T key)
+    {
+        if (root == nullptr)
+        {
+            return;
         }
-        if (i < current->keys.size()&& key == current->keys[i]) {
-            return true;
+        remove(root, key);
+        if (root->keys.empty() && !root->isLeaf)
+        {
+            Node *tmp = root;
+            root = root->children[0];
+            delete tmp;
         }
-        if (current->isLeaf) {
-            return false;
-        }
-        current = current->children[i];
     }
-    return false;
-}
-
-// Implementation of insert function
-template <typename T> void BPlusTree<T>::insert(T key)
-{
-    if (root == nullptr) {
-        root = new Node(true);
-        root->keys.push_back(key);
-    }
-    else {
-        if (root->keys.size() == 2 * t - 1) {
-            Node* newRoot = new Node();
-            newRoot->children.push_back(root);
-            splitChild(newRoot, 0, root);
-            root = newRoot;
-        }
-        insertNonFull(root, key);
-    }
-}
-
-// Implementation of remove function
-template <typename T> void BPlusTree<T>::remove(T key)
-{
-    if (root == nullptr) {
-        return;
-    }
-    remove(root, key);
-    if (root->keys.empty() && !root->isLeaf) {
-        Node* tmp = root;
-        root = root->children[0];
-        delete tmp;
-    }
-}
+};
 
 
 class Graph {
@@ -561,144 +628,45 @@ private:
     int currentShelterId;
     int currentEquipmentId;
 
-    bool isLoggedIn;
+    int isLoggedIn; // 0: Not logged in, 1: Admin, 2: Rescue Team
     string currentUser;
     map<string, string> users;
-
-    void loadAllData()
-    {
-        loadUsers();
-        loadCities();
-        loadEquipment();
-    }
-
-    void saveAllData()
-    {
-        saveUsers();
-        saveCities();
-        saveEquipment();
-    }
+    map<string, string> RescueUsers;
 
     void loadUsers()
     {
         ifstream file("users.txt");
-        string line;
-        while (getline(file, line))
+        string username, password;
+        while (getline(file, username))
         {
-            stringstream ss(line);
-            string username, password;
-            getline(ss, username, '|');
-            getline(ss, password);
+            getline(file, password);
             users[username] = password;
         }
         file.close();
     }
-
-    void saveUsers()
+    void loadRescueUsers()
     {
-        ofstream file("users.txt");
-        for (auto &user : users)
+        ifstream file("rescueUsers.txt");
+        string username, password;
+        while (getline(file, username))
         {
-            file << user.first << "|" << user.second << "\n";
+            getline(file, password);
+            RescueUsers[username] = password;
         }
         file.close();
     }
-
-    void loadCities()
-    {
-        ifstream file("cities.txt");
-        string line;
-        while (getline(file, line))
-        {
-            stringstream ss(line);
-            City city;
-            string temp;
-
-            getline(ss, city.name, '|');
-            getline(ss, city.state, '|');
-            getline(ss, temp, '|');
-            city.latitude = stod(temp);
-            getline(ss, temp, '|');
-            city.longitude = stod(temp);
-            getline(ss, temp, '|');
-            city.population = stoi(temp);
-            getline(ss, temp, '|');
-            city.fireStations = stoi(temp);
-            getline(ss, temp, '|');
-            city.policeStations = stoi(temp);
-            getline(ss, temp, '|');
-            city.emergencyVehicles = stoi(temp);
-
-            cities[city.name] = city;
-        }
-        file.close();
-    }
-
-    void saveCities()
-    {
-        ofstream file("cities.txt");
-        for (auto &city : cities)
-        {
-            auto &c = city.second;
-            file << c.name << "|" << c.state << "|"
-                 << fixed << setprecision(6) << c.latitude << "|"
-                 << fixed << setprecision(6) << c.longitude << "|"
-                 << c.population << "|"
-                 << c.fireStations << "|"
-                 << c.policeStations << "|"
-                 << c.emergencyVehicles << "\n";
-        }
-        file.close();
-    }
-
-    void loadEquipment()
-    {
-        ifstream file("equipment.txt");
-        string line;
-        while (getline(file, line))
-        {
-            stringstream ss(line);
-            Equipment eq;
-            string temp;
-
-            getline(ss, temp, '|');
-            eq.id = stoi(temp);
-            getline(ss, eq.name, '|');
-            getline(ss, eq.type, '|');
-            getline(ss, temp, '|');
-            eq.isAvailable = (temp == "1");
-            getline(ss, eq.currentLocation, '|');
-            getline(ss, temp, '|');
-            eq.condition = stoi(temp);
-
-            equipment[eq.id] = eq;
-        }
-        file.close();
-    }
-
-    void saveEquipment()
-    {
-        ofstream file("equipment.txt");
-        for (auto &eq : equipment)
-        {
-            file << eq.second.id << "|" << eq.second.name << "|" << eq.second.type << "|"
-                 << (eq.second.isAvailable ? 1 : 0) << "|"
-                 << eq.second.currentLocation << "|" << eq.second.condition << "\n";
-        }
-        file.close();
-    }
-
     void showMenu()
     {
-        cout << "\nWelcome to Disaster Management System!" << endl;
+        cout << "\nWelcome to Relief Link! How can we help you?" << endl;
         cout << "1. Login as Admin" << endl;
-        cout << "2. Report Disaster" << endl;
-        cout << "3. Request Help (Citizen)" << endl;
-        cout << "4. Exit" << endl;
+        cout << "2. Login as Rescue Team" << endl;
+        cout << "3. Report Disaster" << endl;
+        cout << "4. Request Help (Citizen)" << endl;
+        cout << "5. Exit" << endl;
     }
-
     void adminMenu()
     {
+        changeColor();
         while (true)
         {
             cout << "\nAdmin Menu:" << endl;
@@ -707,7 +675,7 @@ private:
             cout << "3. View and Assign Teams to Disasters" << endl;
             cout << "4. View and Assign Equipment to Teams" << endl;
             cout << "5. View Hospitals and Shelters" << endl;
-            cout << "6. Logout" << endl;
+            cout << "6. Logout OR Exit" << endl;
             int choice;
             cin >> choice;
 
@@ -733,8 +701,11 @@ private:
             }
             else if (choice == 6)
             {
-                isLoggedIn = false;
+                isLoggedIn = 0;
+                currentUser = "";
                 cout << GREEN << "Logged out successfully!" << RESET << endl;
+                sleep(2);
+                changeColor();
                 break;
             }
             else
@@ -889,14 +860,9 @@ private:
 public:
     DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
-        loadAllData();
+        loadUsers();
+        loadRescueUsers();
     }
-
-    ~DisasterManagementSystem()
-    {
-        saveAllData();
-    }
-
     void run()
     {
         while (true)
@@ -916,9 +882,10 @@ public:
 
                 if (users.find(username) != users.end() && users[username] == password)
                 {
-                    isLoggedIn = true;
+                    isLoggedIn = 1;
                     currentUser = username;
                     cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
                     adminMenu();
                 }
                 else
@@ -928,6 +895,27 @@ public:
             }
             else if (choice == 2)
             {
+                // Rescue Team login
+                string username, password;
+                cout << "Enter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+
+                if (RescueUsers.find(username) != RescueUsers.end() && RescueUsers[username] == password)
+                {
+                    isLoggedIn = 2;
+                    currentUser = username;
+                    cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
+                }
+                else
+                {
+                    cout << RED << "Invalid credentials. Try again." << RESET << endl;
+                }
+            }
+            else if (choice == 3)
+            {
                 // Report Disaster (for admin)
                 if (!isLoggedIn)
                 {
@@ -936,14 +924,14 @@ public:
                 }
                 reportDisaster();
             }
-            else if (choice == 3)
+            else if (choice == 4)
             {
                 // Citizen Request (no login required)
                 citizenRequest();
             }
-            else if (choice == 4)
+            else if (choice == 5)
             {
-                break;
+                return;
             }
             else
             {
@@ -953,28 +941,32 @@ public:
     }
 };
 
-class Alert {
+class Alert
+{
 private:
     int AlertID;
     int DisasterID;
     int Severity;
     string Message;
     string Time;
+
 public:
-    Alert(int alertID, int disasterID, int severity, string message, string time) {
+    Alert(int alertID, int disasterID, int severity, string message, string time)
+    {
         AlertID = alertID;
         DisasterID = disasterID;
         Severity = severity;
         Message = message;
         Time = time;
     }
-    
+
     int getSeverity() const { return Severity; }
     string getMessage() const { return Message; }
     string getTime() const { return Time; }
     int getAlertID() const { return AlertID; }
-    
-    friend ostream &operator<<(ostream &os, const Alert &alert) {
+
+    friend ostream &operator<<(ostream &os, const Alert &alert)
+    {
         os << "AlertID: " << alert.AlertID
            << ", DisasterID: " << alert.DisasterID
            << ", Severity: " << alert.Severity
@@ -984,72 +976,82 @@ public:
     }
 };
 
-class MaxHeap {
+class MaxHeap
+{
 private:
     vector<Alert> heap;
-    
+
     int parent(int index) { return (index - 1) / 2; }
     int leftChild(int index) { return 2 * index + 1; }
     int rightChild(int index) { return 2 * index + 2; }
-    
-    void heapifyUp(int index) {
-        while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity()) {
+
+    void heapifyUp(int index)
+    {
+        while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity())
+        {
             swap(heap[index], heap[parent(index)]);
             index = parent(index);
         }
     }
-    
-    void heapifyDown(int index) {
+
+    void heapifyDown(int index)
+    {
         int largest = index;
         int left = leftChild(index);
         int right = rightChild(index);
-        
+
         if (left < heap.size() && heap[left].getSeverity() > heap[largest].getSeverity())
             largest = left;
-        
+
         if (right < heap.size() && heap[right].getSeverity() > heap[largest].getSeverity())
             largest = right;
-        
-        if (largest != index) {
+
+        if (largest != index)
+        {
             swap(heap[index], heap[largest]);
             heapifyDown(largest);
         }
     }
+
 public:
-    void insert(const Alert &alert) {
+    void insert(const Alert &alert)
+    {
         heap.push_back(alert);
-        heapifyUp((int) heap.size() - 1);
+        heapifyUp((int)heap.size() - 1);
     }
-    
-    Alert extractMax() {
+
+    Alert extractMax()
+    {
         if (heap.empty())
             throw runtime_error("Heap is empty!");
-        
+
         Alert maxAlert = heap[0];
         heap[0] = heap.back();
         heap.pop_back();
         heapifyDown(0);
         return maxAlert;
     }
-    
-    Alert getMax() const {
+
+    Alert getMax() const
+    {
         if (heap.empty())
             throw runtime_error("Heap is empty!");
         return heap[0];
     }
-    
-    bool isEmpty() const {
+
+    bool isEmpty() const
+    {
         return heap.empty();
     }
-    
-    void displayHeap() const {
-        for (const Alert &alert : heap) {
+
+    void displayHeap() const
+    {
+        for (const Alert &alert : heap)
+        {
             cout << alert << endl;
         }
     }
 };
-
-
 
 class TrieNode
 {
@@ -1075,6 +1077,7 @@ private:
             prefix.pop_back();
         }
     }
+
 public:
     Trie() : root(new TrieNode()) {}
     void insert(string word)
@@ -1112,7 +1115,7 @@ public:
     void insertBulk(string data)
     {
         int start = 0, end = 0;
-        while ((end = (int) data.find(',', start)) != string::npos)
+        while ((end = (int)data.find(',', start)) != string::npos)
         {
             insert(data.substr(start, end - start));
             start = end + 1;
@@ -1139,7 +1142,8 @@ private:
     }
 };
 
-struct Point {
+struct Point
+{
     double x;
     double y;
     string shelter_name;
@@ -1148,29 +1152,36 @@ struct Point {
         : x(_x), y(_y), shelter_name(_shelter_name) {}
 };
 
-struct KDNode {
+struct KDNode
+{
     Point point;
-    KDNode* left;
-    KDNode* right;
+    KDNode *left;
+    KDNode *right;
 
     KDNode(Point p) : point(p), left(nullptr), right(nullptr) {}
 };
 
-class KDTree {
+class KDTree
+{
 private:
-    KDNode* root;
+    KDNode *root;
 
-    KDNode* insertRec(KDNode* node, Point point, unsigned depth) {
-        if (!node) return new KDNode(point);
+    KDNode *insertRec(KDNode *node, Point point, unsigned depth)
+    {
+        if (!node)
+            return new KDNode(point);
 
         unsigned cd = depth % 2;
 
-        if (cd == 0) {
+        if (cd == 0)
+        {
             if (point.x < node->point.x)
                 node->left = insertRec(node->left, point, depth + 1);
             else
                 node->right = insertRec(node->right, point, depth + 1);
-        } else {
+        }
+        else
+        {
             if (point.y < node->point.y)
                 node->left = insertRec(node->left, point, depth + 1);
             else
@@ -1180,90 +1191,95 @@ private:
         return node;
     }
 
-    void nearestNeighbor(KDNode* node, Point target, unsigned depth, KDNode*& best, double& bestDist) {
-        if (!node) return;
+    void nearestNeighbor(KDNode *node, Point target, unsigned depth, KDNode *&best, double &bestDist)
+    {
+        if (!node)
+            return;
 
         double dist = distance(node->point, target);
 
-        if (dist < bestDist) {
+        if (dist < bestDist)
+        {
             best = node;
             bestDist = dist;
         }
 
         unsigned cd = depth % 2;
-        KDNode* primary = (cd == 0 ? (target.x < node->point.x ? node->left : node->right)
+        KDNode *primary = (cd == 0 ? (target.x < node->point.x ? node->left : node->right)
                                    : (target.y < node->point.y ? node->left : node->right));
-        KDNode* secondary = (primary == node->left ? node->right : node->left);
+        KDNode *secondary = (primary == node->left ? node->right : node->left);
 
         nearestNeighbor(primary, target, depth + 1, best, bestDist);
 
         double splitDist = (cd == 0 ? fabs(target.x - node->point.x) : fabs(target.y - node->point.y));
-        if (splitDist < bestDist) {
+        if (splitDist < bestDist)
+        {
             nearestNeighbor(secondary, target, depth + 1, best, bestDist);
         }
     }
 
-    double distance(Point a, Point b) {
+    double distance(Point a, Point b)
+    {
         return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     }
 
 public:
     KDTree() : root(nullptr) {}
 
-    void insert(Point point) {
+    void insert(Point point)
+    {
         root = insertRec(root, point, 0);
     }
 
-    string findNearest(Point target) {
-        KDNode* best = nullptr;
+    string findNearest(Point target)
+    {
+        KDNode *best = nullptr;
         double bestDist = numeric_limits<double>::max();
 
         nearestNeighbor(root, target, 0, best, bestDist);
 
-        if (best) return best->point.shelter_name;
+        if (best)
+            return best->point.shelter_name;
         return "No shelters found";
     }
 };
 
-
 int main()
 {
-    Trie trie;
-    trie.insertBulk("New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose");
-    cout << "Search 'Chicago': " << (trie.search("Chicago") ? "Found" : "Not Found") << endl;
-    cout << "Search 'Miami': " << (trie.search("Miami") ? "Found" : "Not Found") << endl;
-    cout << "Starts with 'San': " << (trie.startsWith("San") ? "Yes" : "No") << endl;
-    cout << "Starts with 'Bos': " << (trie.startsWith("Bos") ? "Yes" : "No") << endl;
-    cout << "Autocomplete 'San':" << endl;
-    vector<string> results = trie.autocomplete("San");
-    for (string &result : results)
-    {
-        cout << "  " << result << endl;
-    }
+    //     Trie trie;
+    //     trie.insertBulk("New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose");
+    //     cout << "Search 'Chicago': " << (trie.search("Chicago") ? "Found" : "Not Found") << endl;
+    //     cout << "Search 'Miami': " << (trie.search("Miami") ? "Found" : "Not Found") << endl;
+    //     cout << "Starts with 'San': " << (trie.startsWith("San") ? "Yes" : "No") << endl;
+    //     cout << "Starts with 'Bos': " << (trie.startsWith("Bos") ? "Yes" : "No") << endl;
+    //     cout << "Autocomplete 'San':" << endl;
+    //     vector<string> results = trie.autocomplete("San");
+    //     for (string &result : results)
+    //     {
+    //         cout << "  " << result << endl;
+    //     }
 
+    // MaxHeap alertHeap;
+
+    // alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));
+    // alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));
+    // alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));
+    // alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
+
+    // cout << "Alerts in Max-Heap:" << endl;
+    // alertHeap.displayHeap();
+    // cout << endl;
+
+    // cout << "Processing Alerts by Priority:" << endl;
+    // while (!alertHeap.isEmpty())
+    // {
+    //     Alert alert = alertHeap.extractMax();
+    //     cout << "Processing: " << alert << endl;
+    // }
+    animatePrint("Logo.txt");
+    animatePrint("Welcome.txt");
     DisasterManagementSystem dms;
     dms.run();
-
-
-    MaxHeap alertHeap;
-    
-    alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));
-    alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));
-    alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));
-    alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
-    
-    cout << "Alerts in Max-Heap:" << endl;
-    alertHeap.displayHeap();
-    cout << endl;
-    
-    cout << "Processing Alerts by Priority:" << endl;
-    while (!alertHeap.isEmpty()) {
-        Alert alert = alertHeap.extractMax();
-        cout << "Processing: " << alert << endl;
-    }
-    
+    animatePrint("Thanks.txt");
     return 0;
 }
-
-
-
