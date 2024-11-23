@@ -1338,6 +1338,92 @@ private:
     }
 };
 
+struct Point {
+    double x;
+    double y;
+    string shelter_name;
+
+    Point(double _x, double _y, string _shelter_name)
+        : x(_x), y(_y), shelter_name(_shelter_name) {}
+};
+
+struct KDNode {
+    Point point;
+    KDNode* left;
+    KDNode* right;
+
+    KDNode(Point p) : point(p), left(nullptr), right(nullptr) {}
+};
+
+class KDTree {
+private:
+    KDNode* root;
+
+    KDNode* insertRec(KDNode* node, Point point, unsigned depth) {
+        if (!node) return new KDNode(point);
+
+        unsigned cd = depth % 2;
+
+        if (cd == 0) {
+            if (point.x < node->point.x)
+                node->left = insertRec(node->left, point, depth + 1);
+            else
+                node->right = insertRec(node->right, point, depth + 1);
+        } else {
+            if (point.y < node->point.y)
+                node->left = insertRec(node->left, point, depth + 1);
+            else
+                node->right = insertRec(node->right, point, depth + 1);
+        }
+
+        return node;
+    }
+
+    void nearestNeighbor(KDNode* node, Point target, unsigned depth, KDNode*& best, double& bestDist) {
+        if (!node) return;
+
+        double dist = distance(node->point, target);
+
+        if (dist < bestDist) {
+            best = node;
+            bestDist = dist;
+        }
+
+        unsigned cd = depth % 2;
+        KDNode* primary = (cd == 0 ? (target.x < node->point.x ? node->left : node->right)
+                                   : (target.y < node->point.y ? node->left : node->right));
+        KDNode* secondary = (primary == node->left ? node->right : node->left);
+
+        nearestNeighbor(primary, target, depth + 1, best, bestDist);
+
+        double splitDist = (cd == 0 ? fabs(target.x - node->point.x) : fabs(target.y - node->point.y));
+        if (splitDist < bestDist) {
+            nearestNeighbor(secondary, target, depth + 1, best, bestDist);
+        }
+    }
+
+    double distance(Point a, Point b) {
+        return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    }
+
+public:
+    KDTree() : root(nullptr) {}
+
+    void insert(Point point) {
+        root = insertRec(root, point, 0);
+    }
+
+    string findNearest(Point target) {
+        KDNode* best = nullptr;
+        double bestDist = numeric_limits<double>::max();
+
+        nearestNeighbor(root, target, 0, best, bestDist);
+
+        if (best) return best->point.shelter_name;
+        return "No shelters found";
+    }
+};
+
 
 int main()
 {
