@@ -628,6 +628,123 @@ template <typename T> void BPlusTree<T>::remove(T key)
     }
 }
 
+
+class Graph {
+private:
+    unordered_map<string, vector<pair<string, int>>> adj; // Node -> [(Neighbor, Weight)]
+public:
+    void addNode(const string& node) {
+        if (adj.find(node) == adj.end()) adj[node] = {};
+    }
+
+    void addEdge(const string& from, const string& to, int weight) {
+        adj[from].push_back({to, weight});
+        adj[to].push_back({from, weight}); // For undirected graph
+    }
+
+    // Shortest Path: Basic Dijkstra
+    vector<string> dijkstra(const string& start, const string& end) {
+        unordered_map<string, int> dist;
+        unordered_map<string, string> parent;
+        for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
+        dist[start] = 0;
+
+        priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
+        pq.push({0, start});
+
+        while (!pq.empty()) {
+            auto [d, current] = pq.top();
+            pq.pop();
+            if (current == end) break;
+
+            for (auto& [neighbor, weight] : adj[current]) {
+                if (dist[current] + weight < dist[neighbor]) {
+                    dist[neighbor] = dist[current] + weight;
+                    pq.push({dist[neighbor], neighbor});
+                    parent[neighbor] = current;
+                }
+            }
+        }
+
+        vector<string> path;
+        for (string at = end; at != start; at = parent[at]) {
+            path.push_back(at);
+            if (parent.find(at) == parent.end()) return {}; // No path found
+        }
+        path.push_back(start);
+        reverse(path.begin(), path.end());
+        return path;
+    }
+
+    // Optimal Path: Considering route easibility
+    vector<string> optimalPath(const string& start, const string& end, int maxWeight) {
+        unordered_map<string, int> dist;
+        unordered_map<string, string> parent;
+        for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
+        dist[start] = 0;
+
+        priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
+        pq.push({0, start});
+
+        while (!pq.empty()) {
+            auto [d, current] = pq.top();
+            pq.pop();
+            if (current == end) break;
+
+            for (auto& [neighbor, weight] : adj[current]) {
+                if (weight > maxWeight) continue; // Skip edges that don't satisfy easibility
+                if (dist[current] + weight < dist[neighbor]) {
+                    dist[neighbor] = dist[current] + weight;
+                    pq.push({dist[neighbor], neighbor});
+                    parent[neighbor] = current;
+                }
+            }
+        }
+
+        vector<string> path;
+        for (string at = end; at != start; at = parent[at]) {
+            path.push_back(at);
+            if (parent.find(at) == parent.end()) return {}; // No path found
+        }
+        path.push_back(start);
+        reverse(path.begin(), path.end());
+        return path;
+    }
+};
+
+class RoutingSystem {
+private:
+    Graph graph;
+public:
+    void updateGraph(const string& from, const string& to, int weight) {
+        graph.addNode(from);
+        graph.addNode(to);
+        graph.addEdge(from, to, weight);
+    }
+
+    void shortestPath(const string& start, const string& end) {
+        vector<string> path = graph.dijkstra(start, end);
+        if (path.empty()) {
+            cout << "No path found between " << start << " and " << end << endl;
+        } else {
+            cout << "Shortest path from " << start << " to " << end << ": ";
+            for (const string& node : path) cout << node << " ";
+            cout << endl;
+        }
+    }
+
+    void calculateOptimalPath(const string& start, const string& end, int maxWeight) {
+        vector<string> path = graph.optimalPath(start, end, maxWeight);
+        if (path.empty()) {
+            cout << "No optimal path found between " << start << " and " << end << " under max weight " << maxWeight << endl;
+        } else {
+            cout << "Optimal path (max weight " << maxWeight << ") from " << start << " to " << end << ": ";
+            for (const string& node : path) cout << node << " ";
+            cout << endl;
+        }
+    }
+};
+
 class DisasterManagementSystem
 {
 private:
