@@ -1,4 +1,21 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+#include <iomanip>
+#include <ctime>
+#include <algorithm>
+#include <thread>
+#include <stack>
+#include <list>
+#include <set>
+#include <unordered_map>
+#include <climits>
+#include <cmath>
 #include <unistd.h>
 
 using namespace std;
@@ -184,18 +201,6 @@ ostream &operator<<(ostream &os, const Disaster *D)
     }
     return os;
 }
-struct RescueTeam
-{
-    int id;
-    string name;
-    Location currentLocation;
-    bool isAvailable;
-    string specialization;
-    int memberCount;
-    vector<int> equippedWith;
-};
-
-
 
 template <typename T>
 class HashTable
@@ -705,14 +710,6 @@ public:
 //     }
 // };
 
-struct Disaster {
-    string disaster_ID;
-    int severity;
-};
-
-// HashMap for location mapping to disasters
-unordered_map<string, Disaster> locationToDisaster;
-
 // Graph class to represent locations and routes
 class Graph {
 private:
@@ -826,6 +823,14 @@ private:
     bool availabilityStatus;
     vector<string> skills;
     RoutingSystem* routingSystem; // Pointer to the RoutingSystem object
+    
+    struct Disaster {
+        string disaster_ID;
+        int severity;
+    };
+
+    // HashMap for location mapping to disasters
+    unordered_map<string, Disaster> locationToDisaster;
 
 public:
     RescueTeam(const string& id, const string& loc, int cap, bool status, const vector<string>& skillset, RoutingSystem* rs)
