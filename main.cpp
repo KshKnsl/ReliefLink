@@ -1,22 +1,4 @@
-
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <queue>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <iomanip>
-#include <ctime>
-#include <algorithm>
-#include <thread>
-#include <stack>
-#include <list>
-#include <set>
-#include <unordered_map>
-#include <climits>
-#include <cmath>
+#include <bits/stdc++.h>
 #include <unistd.h>
 
 using namespace std;
@@ -31,7 +13,7 @@ using namespace std;
 void changeColor()
 {
     cout << "\033[2J\033[1;1H";
-    const string colors[] = {"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8A", "8B", "8C", "8D", "8E", "8F"};
+    const string colors[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", "10", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F", "20", "21", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F", "30", "31", "32", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F", "40", "41", "42", "43", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F", "50", "51", "52", "53", "54", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F", "60", "61", "62", "63", "64", "65", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F", "70", "71", "72", "73", "74", "75", "76", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F", "80", "81", "82", "83", "84", "85", "86", "87", "89", "8A", "8B", "8C", "8D", "8E", "8F"};
     srand((int)time(0));
     int randomIndex = rand() % (sizeof(colors) / sizeof(colors[0]));
     system(("color " + colors[randomIndex]).c_str());
@@ -59,7 +41,7 @@ void animatePrint(const string &filename)
             cout << endl;
         }
         cout << endl;
-        usleep(25000);
+        nanosleep((const struct timespec[]){{0, 25000000L}}, nullptr);
     }
     sleep(1);
     file.close();
@@ -108,19 +90,19 @@ private:
     string address;
     string city;
     string state;
-    
+
 public:
     // Default Constructor
     Location() : latitude(0.0), longitude(0.0), address(""), city(""), state("") {}
-    
+
     // Parameterized Constructor
     Location(double latitude, double longitude, const string &address, const string &city, const string &state)
-    : latitude(latitude), longitude(longitude), address(address), city(city), state(state) {}
-    
+        : latitude(latitude), longitude(longitude), address(address), city(city), state(state) {}
+
     // Copy Constructor
     Location(const Location &other)
-    : latitude(other.latitude), longitude(other.longitude), address(other.address), city(other.city), state(other.state) {}
-    
+        : latitude(other.latitude), longitude(other.longitude), address(other.address), city(other.city), state(other.state) {}
+
     // Overloaded Assignment Operator
     Location &operator=(const Location &other)
     {
@@ -158,23 +140,23 @@ private:
     int affectedPopulation;
     vector<int> assignedTeams;
     vector<string> requiredResources;
-    
+
 public:
     // Constructor for convenience
     Disaster() {}
     Disaster(int id, const string &type, const Location &location, int severity,
              const string &status, const string &date, int affectedPopulation,
              const vector<int> &assignedTeams, const vector<string> &requiredResources)
-    : id(id), type(type), location(location), severity(severity),
-    status(status), date(date), affectedPopulation(affectedPopulation),
-    assignedTeams(assignedTeams), requiredResources(requiredResources) {}
-    
+        : id(id), type(type), location(location), severity(severity),
+          status(status), date(date), affectedPopulation(affectedPopulation),
+          assignedTeams(assignedTeams), requiredResources(requiredResources) {}
+
     // Comparison operator for ordering (based on id as an example)
     bool operator<(const Disaster &other) const
     {
         return id < other.id;
     }
-    
+
     bool operator==(const Disaster &other) const
     {
         return id == other.id;
@@ -184,20 +166,21 @@ public:
     friend class DisasterManagementSystem;
     template <typename T>
     friend class HashTable;
-    friend ostream &operator<<(ostream &os,const Disaster *D);
+    friend ostream &operator<<(ostream &os, const Disaster *D);
 };
-ostream &operator<<(ostream &os,const Disaster *D)
+ostream &operator<<(ostream &os, const Disaster *D)
 {
-    os<< "ID: " << D->id << endl;
-    os<<"Type: " << D->type<<endl;
-    os<< "Status: " << D->status <<endl;
-    os<<"Severity: " << D->severity<<endl;
-    os<<"Date Of Disaster: "<<D->date<<endl;
-    os<< "Affected Population: " << D->affectedPopulation << endl;
-    os<<"Location: "<<D->location<<endl;
-    os<<"Assigned Rescue Teams: ";
-    for(auto k:D->assignedTeams){
-        os<<k<<" ";
+    os << "ID: " << D->id << endl;
+    os << "Type: " << D->type << endl;
+    os << "Status: " << D->status << endl;
+    os << "Severity: " << D->severity << endl;
+    os << "Date Of Disaster: " << D->date << endl;
+    os << "Affected Population: " << D->affectedPopulation << endl;
+    os << "Location: " << D->location << endl;
+    os << "Assigned Rescue Teams: ";
+    for (auto k : D->assignedTeams)
+    {
+        os << k << " ";
     }
     return os;
 }
@@ -225,69 +208,82 @@ struct Shelter
     vector<string> facilities;
 };
 
-
-
 template <typename T>
-class HashTable{
+class HashTable
+{
     vector<T *> V;
     int size;
     int total;
+
 public:
-    HashTable(int s){
-        V.resize(s,NULL);
-        size=s;
-        total=0;
+    HashTable(int s)
+    {
+        V.resize(s, NULL);
+        size = s;
+        total = 0;
     }
-    int Hash(int k,int i=0){
-        return (k+i)%size;
+    int Hash(int k, int i = 0)
+    {
+        return (k + i) % size;
     }
-    float Load(){
-        return (1.0*total)/size;
+    float Load()
+    {
+        return (1.0 * total) / size;
     }
-    void Insert(T *D){
-        int pos=Hash(D->id);
-        int i=1;
-        while(V[pos]!=NULL){
-            pos=Hash(D->id,i);
+    void Insert(T *D)
+    {
+        int pos = Hash(D->id);
+        int i = 1;
+        while (V[pos] != NULL)
+        {
+            pos = Hash(D->id, i);
             i++;
         }
-        V[pos]=D;
+        V[pos] = D;
         total++;
-        if(Load()>0.7){
-            IncreaseSize(size*2);
+        if (Load() > 0.7)
+        {
+            IncreaseSize(size * 2);
         }
     }
-    void IncreaseSize(int newSize) {
-        vector<T*> oldTable = V;
+    void IncreaseSize(int newSize)
+    {
+        vector<T *> oldTable = V;
         size = newSize;
         V.clear();
         V.resize(size, nullptr);
         total = 0;
-        for (T *d : oldTable) {
-            if (d != nullptr) {
+        for (T *d : oldTable)
+        {
+            if (d != nullptr)
+            {
                 Insert(d);
             }
         }
     }
-    
-    Disaster * Search(int k){
-        int pos=Hash(k);
-        int i=1;
-        while(V[pos]!=NULL){
-            if(V[pos]->id==k)
+
+    Disaster *Search(int k)
+    {
+        int pos = Hash(k);
+        int i = 1;
+        while (V[pos] != NULL)
+        {
+            if (V[pos]->id == k)
                 break;
-            pos=Hash(k,i);
+            pos = Hash(k, i);
             i++;
         }
         return V[pos];
     }
-    
-    
-    void Delete(int k) {
+
+    void Delete(int k)
+    {
         int pos = Hash(k);
         int i = 1;
-        while (V[pos] != NULL) {
-            if (V[pos]->id == k) {
+        while (V[pos] != NULL)
+        {
+            if (V[pos]->id == k)
+            {
                 V[pos] = NULL;
                 total--;
                 return;
@@ -296,11 +292,7 @@ public:
             i++;
         }
     }
-    
-    
 };
-
-
 
 template <typename T>
 class BPlusTree
@@ -310,16 +302,16 @@ public:
     {
     private:
         bool isLeaf;
-        vector<T*> keys;
+        vector<T *> keys;
         vector<Node *> children;
         Node *next;
-        
+
     public:
         // Constructor
         Node(bool leaf = false) : isLeaf(leaf), next(nullptr) {}
         friend class BPlusTree<T>;
     };
-    
+
     Node *root;
     int t;
     void splitChild(Node *parent, int index, Node *child)
@@ -327,31 +319,31 @@ public:
         Node *newChild = new Node(child->isLeaf);
         parent->children.insert(parent->children.begin() + index + 1, newChild);
         parent->keys.insert(parent->keys.begin() + index, child->keys[t - 1]);
-        
+
         newChild->keys.assign(child->keys.begin() + t, child->keys.end());
         child->keys.resize(t - 1);
-        
+
         if (!child->isLeaf)
         {
             newChild->children.assign(child->children.begin() + t, child->children.end());
             child->children.resize(t);
         }
-        
+
         if (child->isLeaf)
         {
             newChild->next = child->next;
             child->next = newChild;
         }
     }
-    
+
     // Implementation of insertNonFull function
     void insertNonFull(Node *node, T *key)
     {
         if (node->isLeaf)
         {
-            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key, [](const T* a, const T* b) {
-                return a->id < b->id;
-            }), key);
+            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key, [](const T *a, const T *b)
+                                          { return a->id < b->id; }),
+                              key);
         }
         else
         {
@@ -361,7 +353,7 @@ public:
                 i--;
             }
             i++;
-            if ((int) node->children[i]->keys.size() == 2 * t - 1)
+            if ((int)node->children[i]->keys.size() == 2 * t - 1)
             {
                 splitChild(node, i, node->children[i]);
                 if (key->id > node->keys[i]->id)
@@ -372,7 +364,7 @@ public:
             insertNonFull(node->children[i], key);
         }
     }
-    
+
     // Implementation of remove function
     void remove(Node *node, int key)
     {
@@ -446,60 +438,60 @@ public:
             }
         }
     }
-    
+
     // Implementation of borrowFromPrev function
     void borrowFromPrev(Node *node, int index)
     {
         Node *child = node->children[index];
         Node *sibling = node->children[index - 1];
-        
+
         child->keys.insert(child->keys.begin(), node->keys[index - 1]);
         node->keys[index - 1] = sibling->keys.back();
         sibling->keys.pop_back();
-        
+
         if (!child->isLeaf)
         {
             child->children.insert(child->children.begin(), sibling->children.back());
             sibling->children.pop_back();
         }
     }
-    
+
     // Implementation of borrowFromNext function
     void borrowFromNext(Node *node, int index)
     {
         Node *child = node->children[index];
         Node *sibling = node->children[index + 1];
-        
+
         child->keys.push_back(node->keys[index]);
         node->keys[index] = sibling->keys.front();
         sibling->keys.erase(sibling->keys.begin());
-        
+
         if (!child->isLeaf)
         {
             child->children.push_back(sibling->children.front());
             sibling->children.erase(sibling->children.begin());
         }
     }
-    
+
     // Implementation of merge function
     void merge(Node *node, int index)
     {
         Node *child = node->children[index];
         Node *sibling = node->children[index + 1];
-        
+
         child->keys.push_back(node->keys[index]);
         child->keys.insert(child->keys.end(), sibling->keys.begin(), sibling->keys.end());
         if (!child->isLeaf)
         {
             child->children.insert(child->children.end(), sibling->children.begin(), sibling->children.end());
         }
-        
+
         node->keys.erase(node->keys.begin() + index);
         node->children.erase(node->children.begin() + index + 1);
-        
+
         delete sibling;
     }
-    
+
     // Implementation of printTree function
     void printTree(Node *node, int level)
     {
@@ -515,23 +507,24 @@ public:
             }
         }
     }
-    void AddDisasterToHash(HashTable<T> *H,Node *node, int level)
+    void AddDisasterToHash(HashTable<T> *H, Node *node, int level)
     {
         if (node != nullptr)
         {
             for (const T *key : node->keys)
             {
-                if(key->status=="Active"){
+                if (key->status == "Active")
+                {
                     H->Insert(key);
                 }
             }
             for (Node *child : node->children)
             {
-                AddDisasterToHash(H,child,level + 1);
+                AddDisasterToHash(H, child, level + 1);
             }
         }
     }
-    
+
 public:
     BPlusTree(int degree) : root(nullptr), t(degree) {}
     // Implementation of printTree wrapper function
@@ -539,9 +532,9 @@ public:
     {
         printTree(root, 0);
     }
-    
+
     // Implementation of search function
-    T* search(int key)
+    T *search(int key)
     {
         Node *current = root;
         while (current != nullptr)
@@ -563,7 +556,7 @@ public:
         }
         return NULL;
     }
-    
+
     // Implementation of insert function
     void insert(T *key)
     {
@@ -584,7 +577,7 @@ public:
             insertNonFull(root, key);
         }
     }
-    
+
     // Implementation of remove function
     void remove(int key)
     {
@@ -600,15 +593,12 @@ public:
             delete tmp;
         }
     }
-    
-    
+
     void AddActiveDisaster(HashTable<T> *H)
     {
         AddDisasterToHash(H, root, 0);
     }
-    
 };
-
 
 // class Graph {
 // private:
@@ -617,27 +607,27 @@ public:
 //     void addNode(const string& node) {
 //         if (adj.find(node) == adj.end()) adj[node] = {};
 //     }
-    
+
 //     void addEdge(const string& from, const string& to, int weight) {
 //         adj[from].push_back({to, weight});
 //         adj[to].push_back({from, weight}); // For undirected graph
 //     }
-    
+
 //     // Shortest Path: Basic Dijkstra
 //     vector<string> dijkstra(const string& start, const string& end) {
 //         unordered_map<string, int> dist;
 //         unordered_map<string, string> parent;
 //         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
 //         dist[start] = 0;
-        
+
 //         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
 //         pq.push({0, start});
-        
+
 //         while (!pq.empty()) {
 //             auto [d, current] = pq.top();
 //             pq.pop();
 //             if (current == end) break;
-            
+
 //             for (auto& [neighbor, weight] : adj[current]) {
 //                 if (dist[current] + weight < dist[neighbor]) {
 //                     dist[neighbor] = dist[current] + weight;
@@ -646,7 +636,7 @@ public:
 //                 }
 //             }
 //         }
-        
+
 //         vector<string> path;
 //         for (string at = end; at != start; at = parent[at]) {
 //             path.push_back(at);
@@ -656,22 +646,22 @@ public:
 //         reverse(path.begin(), path.end());
 //         return path;
 //     }
-    
+
 //     // Optimal Path: Considering route easibility
 //     vector<string> optimalPath(const string& start, const string& end, int maxWeight) {
 //         unordered_map<string, int> dist;
 //         unordered_map<string, string> parent;
 //         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
 //         dist[start] = 0;
-        
+
 //         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
 //         pq.push({0, start});
-        
+
 //         while (!pq.empty()) {
 //             auto [d, current] = pq.top();
 //             pq.pop();
 //             if (current == end) break;
-            
+
 //             for (auto& [neighbor, weight] : adj[current]) {
 //                 if (weight > maxWeight) continue; // Skip edges that don't satisfy easibility
 //                 if (dist[current] + weight < dist[neighbor]) {
@@ -681,7 +671,7 @@ public:
 //                 }
 //             }
 //         }
-        
+
 //         vector<string> path;
 //         for (string at = end; at != start; at = parent[at]) {
 //             path.push_back(at);
@@ -702,7 +692,7 @@ public:
 //         graph.addNode(to);
 //         graph.addEdge(from, to, weight);
 //     }
-    
+
 //     void shortestPath(const string& start, const string& end) {
 //         vector<string> path = graph.dijkstra(start, end);
 //         if (path.empty()) {
@@ -713,7 +703,7 @@ public:
 //             cout << endl;
 //         }
 //     }
-    
+
 //     void calculateOptimalPath(const string& start, const string& end, int maxWeight) {
 //         vector<string> path = graph.optimalPath(start, end, maxWeight);
 //         if (path.empty()) {
@@ -735,17 +725,17 @@ private:
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
-    
+
     int currentDisasterId;
     int currentTeamId;
     int currentShelterId;
     int currentEquipmentId;
-    
+
     int isLoggedIn; // 0: Not logged in, 1: Admin, 2: Rescue Team
     string currentUser;
     map<string, string> users;
     map<string, string> RescueUsers;
-    
+
     void loadUsers()
     {
         ifstream file("users.txt");
@@ -791,7 +781,7 @@ private:
             cout << "6. Logout OR Exit" << endl;
             int choice;
             cin >> choice;
-            
+
             if (choice == 1)
             {
                 reportDisaster();
@@ -802,11 +792,11 @@ private:
             }
             else if (choice == 3)
             {
-                //                assignTeams();
+                assignTeams();
             }
             else if (choice == 4)
             {
-                //                assignEquipment();
+                
             }
             else if (choice == 5)
             {
@@ -827,14 +817,14 @@ private:
             }
         }
     }
-    
+
     void reportDisaster()
     {
         string disasterType, status, date;
         double latitude, longitude;
         int severity, affectedPopulation;
-        string address,city,state;
-        
+        string address, city, state;
+
         cout << "Enter disaster type: ";
         cin >> disasterType;
         cout << "Enter status (e.g., ongoing, resolved): ";
@@ -853,54 +843,47 @@ private:
         cin >> severity;
         cout << "Enter affected population: ";
         cin >> affectedPopulation;
-        
+
         Location loc(latitude, longitude, address, city, state);
-        Disaster *D=new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
+        Disaster *D = new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
         disasters->insert(D);
         cout << GREEN << "Disaster reported successfully!" << RESET << endl;
     }
-    
-    
-    
-    
+
     void viewAllDisasters()
     {
         cout << "Disasters Reported:" << endl;
         disasters->printTree();
     }
-    
-    
-    
-    
-    void UpdateStatus(){
-        if (disasters==NULL)
+
+    void UpdateStatus()
+    {
+        if (disasters == NULL)
         {
             cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
         }
-        
+
         int disasterId;
         cout << "Enter Disaster ID to Update Severity: ";
         cin >> disasterId;
-        Disaster *find=disasters->search(disasterId);
-        if (find==NULL)
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
             cout << RED << "Invalid disaster ID." << RESET << endl;
             return;
         }
-        
+
         string status;
         cout << "Enter Updated Status: ";
         cin >> status;
-        find->status=status;
+        find->status = status;
         cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
-    
-    
-    
-    
-    void UpdateSeverity(){
-        if (disasters==NULL)
+
+    void UpdateSeverity()
+    {
+        if (disasters == NULL)
         {
             cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
@@ -908,25 +891,23 @@ private:
         int disasterId;
         cout << "Enter Disaster ID to Update Severity: ";
         cin >> disasterId;
-        Disaster *find=disasters->search(disasterId);
-        if (find==NULL)
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
             cout << RED << "Invalid disaster ID." << RESET << endl;
             return;
         }
-        
+
         int severity;
         cout << "Enter Updated Severity: ";
         cin >> severity;
-        find->severity=severity;
+        find->severity = severity;
         cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
-    
-    
-    
-    
-    void UpdateLocation(int Did,Location L){
-        if (disasters==NULL)
+
+    void UpdateLocation(int Did, Location L)
+    {
+        if (disasters == NULL)
         {
             cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
@@ -934,14 +915,14 @@ private:
         int disasterId;
         cout << "Enter Disaster ID to Update Severity: ";
         cin >> disasterId;
-        Disaster *find=disasters->search(disasterId);
-        if (find==NULL)
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
             cout << RED << "Invalid disaster ID." << RESET << endl;
             return;
         }
         double latitude, longitude;
-        string address,city,state;
+        string address, city, state;
         cout << "Enter latitude and longitude of disaster: ";
         cin >> latitude >> longitude;
         cout << "Enter Address: ";
@@ -951,30 +932,28 @@ private:
         cout << "Enter State: ";
         cin >> state;
         Location loc(latitude, longitude, address, city, state);
-        find->location=loc;
+        find->location = loc;
         cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
-    
-    
-    
+
     void assignTeams()
     {
-        if (disasters==NULL)
+        if (disasters == NULL)
         {
             cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
         }
-        
+
         int disasterId;
         cout << "Enter disaster ID to assign teams: ";
         cin >> disasterId;
-        Disaster *find=disasters->search(disasterId);
-        if (find==NULL)
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
             cout << RED << "Invalid disaster ID." << RESET << endl;
             return;
         }
-        
+
         int teamId;
         cout << "Enter team ID to assign: ";
         cin >> teamId;
@@ -984,11 +963,11 @@ private:
             cout << RED << "Invalid team ID." << RESET << endl;
             return;
         }
-        
+
         find->assignedTeams.push_back(teamId);
         cout << GREEN << "Team assigned successfully!" << RESET << endl;
     }
-    
+
     //    void assignEquipment()
     //    {
     //        if (disasters.empty())
@@ -1020,7 +999,7 @@ private:
     //        disasters[disasterId].requiredResources.push_back(equipment[equipmentId].name);
     //        cout << GREEN << "Equipment assigned successfully!" << RESET << endl;
     //    }
-    
+
     void viewHospitalsAndShelters()
     {
         cout << "\nHospitals and Shelters Overview:" << endl;
@@ -1030,18 +1009,18 @@ private:
             for (auto &hospital : city.second.hospitals)
             {
                 cout << "ID: " << hospital.id << ", Name: " << hospital.name
-                << ", Location: " << hospital.location << ", Available Beds: " << hospital.availableBeds << endl;
+                     << ", Location: " << hospital.location << ", Available Beds: " << hospital.availableBeds << endl;
             }
         }
-        
+
         cout << "\nShelters:" << endl;
         for (auto &shelter : shelters)
         {
             cout << "ID: " << shelter.second.id << ", Name: " << shelter.second.name
-            << ", Location: " << shelter.second.location << ", Current Occupancy: " << shelter.second.currentOccupancy << endl;
+                 << ", Location: " << shelter.second.location << ", Current Occupancy: " << shelter.second.currentOccupancy << endl;
         }
     }
-    
+
     //    void citizenRequest()
     //    {
     //        int disasterId;
@@ -1056,11 +1035,11 @@ private:
     //
     //        cout << GREEN << "Request submitted successfully! Help is on the way!" << RESET << endl;
     //    }
-    
+
 public:
     DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
-        disasters= new BPlusTree<Disaster>(5);
+        disasters = new BPlusTree<Disaster>(5);
         loadUsers();
         loadRescueUsers();
     }
@@ -1071,7 +1050,7 @@ public:
             showMenu();
             int choice;
             cin >> choice;
-            
+
             if (choice == 1)
             {
                 // Admin login
@@ -1080,7 +1059,7 @@ public:
                 cin >> username;
                 cout << "Enter password: ";
                 cin >> password;
-                
+
                 if (users.find(username) != users.end() && users[username] == password)
                 {
                     isLoggedIn = 1;
@@ -1102,7 +1081,7 @@ public:
                 cin >> username;
                 cout << "Enter password: ";
                 cin >> password;
-                
+
                 if (RescueUsers.find(username) != RescueUsers.end() && RescueUsers[username] == password)
                 {
                     isLoggedIn = 2;
@@ -1150,7 +1129,7 @@ private:
     int Severity;
     string Message;
     string Time;
-    
+
 public:
     Alert(int alertID, int disasterID, int severity, string message, string time)
     {
@@ -1160,19 +1139,19 @@ public:
         Message = message;
         Time = time;
     }
-    
+
     int getSeverity() const { return Severity; }
     string getMessage() const { return Message; }
     string getTime() const { return Time; }
     int getAlertID() const { return AlertID; }
-    
+
     friend ostream &operator<<(ostream &os, const Alert &alert)
     {
         os << "AlertID: " << alert.AlertID
-        << ", DisasterID: " << alert.DisasterID
-        << ", Severity: " << alert.Severity
-        << ", Message: " << alert.Message
-        << ", Time: " << alert.Time;
+           << ", DisasterID: " << alert.DisasterID
+           << ", Severity: " << alert.Severity
+           << ", Message: " << alert.Message
+           << ", Time: " << alert.Time;
         return os;
     }
 };
@@ -1181,11 +1160,11 @@ class MaxHeap
 {
 private:
     vector<Alert> heap;
-    
+
     int parent(int index) { return (index - 1) / 2; }
     int leftChild(int index) { return 2 * index + 1; }
     int rightChild(int index) { return 2 * index + 2; }
-    
+
     void heapifyUp(int index)
     {
         while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity())
@@ -1194,57 +1173,57 @@ private:
             index = parent(index);
         }
     }
-    
+
     void heapifyDown(int index)
     {
         int largest = index;
         int left = leftChild(index);
         int right = rightChild(index);
-        
+
         if (left < heap.size() && heap[left].getSeverity() > heap[largest].getSeverity())
             largest = left;
-        
+
         if (right < heap.size() && heap[right].getSeverity() > heap[largest].getSeverity())
             largest = right;
-        
+
         if (largest != index)
         {
             swap(heap[index], heap[largest]);
             heapifyDown(largest);
         }
     }
-    
+
 public:
     void insert(const Alert &alert)
     {
         heap.push_back(alert);
         heapifyUp((int)heap.size() - 1);
     }
-    
+
     Alert extractMax()
     {
         if (heap.empty())
             throw runtime_error("Heap is empty!");
-        
+
         Alert maxAlert = heap[0];
         heap[0] = heap.back();
         heap.pop_back();
         heapifyDown(0);
         return maxAlert;
     }
-    
+
     Alert getMax() const
     {
         if (heap.empty())
             throw runtime_error("Heap is empty!");
         return heap[0];
     }
-    
+
     bool isEmpty() const
     {
         return heap.empty();
     }
-    
+
     void displayHeap() const
     {
         for (const Alert &alert : heap)
@@ -1270,7 +1249,7 @@ private:
     {
         if (node->isEndOfWord)
             results.push_back(prefix);
-        
+
         for (auto &pair : node->children)
         {
             prefix.push_back(pair.first);
@@ -1278,7 +1257,7 @@ private:
             prefix.pop_back();
         }
     }
-    
+
 public:
     Trie() : root(new TrieNode()) {}
     void insert(string word)
@@ -1312,7 +1291,7 @@ public:
         }
         return results;
     }
-    
+
     void insertBulk(string data)
     {
         int start = 0, end = 0;
@@ -1326,7 +1305,7 @@ public:
             insert(data.substr(start));
         }
     }
-    
+
 private:
     TrieNode *findNode(string prefix)
     {
@@ -1348,9 +1327,9 @@ struct Point
     double x;
     double y;
     string shelter_name;
-    
+
     Point(double _x, double _y, string _shelter_name)
-    : x(_x), y(_y), shelter_name(_shelter_name) {}
+        : x(_x), y(_y), shelter_name(_shelter_name) {}
 };
 
 struct KDNode
@@ -1358,7 +1337,7 @@ struct KDNode
     Point point;
     KDNode *left;
     KDNode *right;
-    
+
     KDNode(Point p) : point(p), left(nullptr), right(nullptr) {}
 };
 
@@ -1366,14 +1345,14 @@ class KDTree
 {
 private:
     KDNode *root;
-    
+
     KDNode *insertRec(KDNode *node, Point point, unsigned depth)
     {
         if (!node)
             return new KDNode(point);
-        
+
         unsigned cd = depth % 2;
-        
+
         if (cd == 0)
         {
             if (point.x < node->point.x)
@@ -1388,57 +1367,57 @@ private:
             else
                 node->right = insertRec(node->right, point, depth + 1);
         }
-        
+
         return node;
     }
-    
+
     void nearestNeighbor(KDNode *node, Point target, unsigned depth, KDNode *&best, double &bestDist)
     {
         if (!node)
             return;
-        
+
         double dist = distance(node->point, target);
-        
+
         if (dist < bestDist)
         {
             best = node;
             bestDist = dist;
         }
-        
+
         unsigned cd = depth % 2;
         KDNode *primary = (cd == 0 ? (target.x < node->point.x ? node->left : node->right)
-                           : (target.y < node->point.y ? node->left : node->right));
+                                   : (target.y < node->point.y ? node->left : node->right));
         KDNode *secondary = (primary == node->left ? node->right : node->left);
-        
+
         nearestNeighbor(primary, target, depth + 1, best, bestDist);
-        
+
         double splitDist = (cd == 0 ? fabs(target.x - node->point.x) : fabs(target.y - node->point.y));
         if (splitDist < bestDist)
         {
             nearestNeighbor(secondary, target, depth + 1, best, bestDist);
         }
     }
-    
+
     double distance(Point a, Point b)
     {
         return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     }
-    
+
 public:
     KDTree() : root(nullptr) {}
-    
+
     void insert(Point point)
     {
         root = insertRec(root, point, 0);
     }
-    
+
     string findNearest(Point target)
     {
         KDNode *best = nullptr;
         double bestDist = numeric_limits<double>::max();
-        
+
         nearestNeighbor(root, target, 0, best, bestDist);
-        
+
         if (best)
             return best->point.shelter_name;
         return "No shelters found";
@@ -1459,18 +1438,18 @@ int main()
     //     {
     //         cout << "  " << result << endl;
     //     }
-    
+
     // MaxHeap alertHeap;
-    
+
     // alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));
     // alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));
     // alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));
     // alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
-    
+
     // cout << "Alerts in Max-Heap:" << endl;
     // alertHeap.displayHeap();
     // cout << endl;
-    
+
     // cout << "Processing Alerts by Priority:" << endl;
     // while (!alertHeap.isEmpty())
     // {
