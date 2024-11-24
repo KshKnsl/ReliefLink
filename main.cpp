@@ -705,12 +705,185 @@ public:
 //     }
 // };
 
+struct Disaster {
+    string disaster_ID;
+    int severity;
+};
+
+// HashMap for location mapping to disasters
+unordered_map<string, Disaster> locationToDisaster;
+
+// Graph class to represent locations and routes
+class Graph {
+private:
+    map<string, vector<pair<string, int>>> adjList; // Adjacency list: location -> [(neighbor, weight)]
+
+public:
+    // Add a new location (node) to the graph
+    void addNode(const string& location) {
+        if (adjList.find(location) == adjList.end()) {
+            adjList[location] = {};
+            cout << "Added location: " + location << endl;
+        } else {
+            cout << "Location already exists: " + location << endl;
+        }
+    }
+
+    // Add a route (edge) between two locations with a distance (weight)
+    void addEdge(const string& from, const string& to, int distance) {
+        adjList[from].push_back({to, distance});
+        adjList[to].push_back({from, distance}); // Assuming undirected graph
+        cout << "Added edge from " + from + " to " + to + " with distance " + to_string(distance) << endl;
+    }
+
+    // Dijkstra's algorithm to find shortest path between two locations
+    vector<string> dijkstra(const string& start, const string& end) {
+        unordered_map<string, int> distances;
+        unordered_map<string, string> previous;
+        set<pair<int, string>> pq; // Min-heap: (distance, location)
+
+        // Initialize distances to infinity
+        for (const auto& node : adjList) {
+            distances[node.first] = numeric_limits<int>::max();
+        }
+        distances[start] = 0;
+        pq.insert({0, start});
+
+        while (!pq.empty()) {
+            auto [currentDist, current] = *pq.begin();
+            pq.erase(pq.begin());
+
+            if (current == end) break;
+
+            for (const auto& neighbor : adjList[current]) {
+                string next = neighbor.first;
+                int weight = neighbor.second;
+
+                if (distances[current] + weight < distances[next]) {
+                    pq.erase({distances[next], next});
+                    distances[next] = distances[current] + weight;
+                    previous[next] = current;
+                    pq.insert({distances[next], next});
+                }
+            }
+        }
+
+        // Reconstruct the shortest path
+        vector<string> path;
+        for (string at = end; !at.empty(); at = previous[at]) {
+            path.push_back(at);
+        }
+        reverse(path.begin(), path.end());
+        return (path.size() > 1) ? path : vector<string>{};
+    }
+
+    // Print graph for debugging
+    void printGraph() {
+        cout << "Graph structure:" << endl;
+        for (const auto& node : adjList) {
+            string output = node.first + " -> ";
+            for (const auto& neighbor : node.second) {
+                output += "(" + neighbor.first + ", " + to_string(neighbor.second) + ") ";
+            }
+            cout << output << endl;
+        }
+    }
+};
+
+// RoutingSystem class to interact with Graph for path calculations
+class RoutingSystem {
+private:
+    Graph graph;
+
+public:
+    void addLocation(const string& location) {
+        graph.addNode(location);
+    }
+
+    void addRoute(const string& from, const string& to, int distance) {
+        graph.addEdge(from, to, distance);
+    }
+
+    vector<string> calculateOptimalPath(const string& start, const string& end) {
+        return graph.dijkstra(start, end);
+    }
+
+    void updateGraph() {
+        cout << "Graph updated successfully!" << endl;
+    }
+
+    void printGraph() {
+        graph.printGraph();
+    }
+};
+
+// RescueTeam class to manage rescue teams
+class RescueTeam {
+private:
+    string teamID;
+    string location;
+    int capacity;
+    bool availabilityStatus;
+    vector<string> skills;
+    RoutingSystem* routingSystem; // Pointer to the RoutingSystem object
+
+public:
+    RescueTeam(const string& id, const string& loc, int cap, bool status, const vector<string>& skillset, RoutingSystem* rs)
+        : teamID(id), location(loc), capacity(cap), availabilityStatus(status), skills(skillset), routingSystem(rs) {}
+
+    // Check for active disaster at a location
+    void checkActiveDisaster(const string& loc) {
+        if (locationToDisaster.find(loc) != locationToDisaster.end()) {
+            cout << "Active disaster at " + loc + ": Disaster ID = " + locationToDisaster[loc].disaster_ID +
+                        ", Severity = " + to_string(locationToDisaster[loc].severity) << endl;
+        } else {
+            cout << "No active disaster at " + loc << endl;
+        }
+    }
+
+    // Update location using RoutingSystem's shortest path method
+    void updateLocation(const string& targetLocation) {
+        if (availabilityStatus) {
+            vector<string> path = routingSystem->calculateOptimalPath(location, targetLocation);
+            if (!path.empty()) {
+                cout << "Updating location. Shortest path: ";
+                for (size_t i = 0; i < path.size(); ++i) {
+                    cout << path[i];
+                    if (i < path.size() - 1) cout << " -> ";
+                }
+                cout << endl;
+                location = targetLocation; // Update the team's location
+            } else {
+                cout << "No valid path to the target location." << endl;
+            }
+        } else {
+            cout << "Rescue team is not available for relocation." << endl;
+        }
+    }
+
+    // Check availability based on skills and status
+    bool checkAvailability(const vector<string>& requiredSkills) {
+        if (!availabilityStatus) {
+            cout << "Rescue team is unavailable." << endl;
+            return false;
+        }
+        for (const string& skill : requiredSkills) {
+            if (find(skills.begin(), skills.end(), skill) == skills.end()) {
+                cout << "Rescue team lacks required skill: " + skill << endl;
+                return false;
+            }
+        }
+        cout << "Rescue team is available and has the required skills." << endl;
+        return true;
+    }
+};
+
+
 class DisasterManagementSystem
 {
 private:
     BPlusTree<Disaster> *disasters;
     map<int, RescueTeam> rescueTeams;
-    map<int, Shelter> shelters;
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
@@ -1002,12 +1175,6 @@ private:
             }
         }
 
-        cout << "\nShelters:" << endl;
-        for (auto &shelter : shelters)
-        {
-            cout << "ID: " << shelter.second.id << ", Name: " << shelter.second.name
-                 << ", Location: " << shelter.second.location << ", Current Occupancy: " << shelter.second.currentOccupancy << endl;
-        }
     }
 
     //    void citizenRequest()
