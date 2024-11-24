@@ -17,6 +17,8 @@
 #include <climits>
 #include <cmath>
 #include <unistd.h>
+#include <stdexcept>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -594,169 +596,65 @@ public:
     }
 };
 
-// class Graph {
-// private:
-//     unordered_map<string, vector<pair<string, int>>> adj; // Node -> [(Neighbor, Weight)]
-// public:
-//     void addNode(const string& node) {
-//         if (adj.find(node) == adj.end()) adj[node] = {};
-//     }
-
-//     void addEdge(const string& from, const string& to, int weight) {
-//         adj[from].push_back({to, weight});
-//         adj[to].push_back({from, weight}); // For undirected graph
-//     }
-
-//     // Shortest Path: Basic Dijkstra
-//     vector<string> dijkstra(const string& start, const string& end) {
-//         unordered_map<string, int> dist;
-//         unordered_map<string, string> parent;
-//         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
-//         dist[start] = 0;
-
-//         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
-//         pq.push({0, start});
-
-//         while (!pq.empty()) {
-//             auto [d, current] = pq.top();
-//             pq.pop();
-//             if (current == end) break;
-
-//             for (auto& [neighbor, weight] : adj[current]) {
-//                 if (dist[current] + weight < dist[neighbor]) {
-//                     dist[neighbor] = dist[current] + weight;
-//                     pq.push({dist[neighbor], neighbor});
-//                     parent[neighbor] = current;
-//                 }
-//             }
-//         }
-
-//         vector<string> path;
-//         for (string at = end; at != start; at = parent[at]) {
-//             path.push_back(at);
-//             if (parent.find(at) == parent.end()) return {}; // No path found
-//         }
-//         path.push_back(start);
-//         reverse(path.begin(), path.end());
-//         return path;
-//     }
-
-//     // Optimal Path: Considering route easibility
-//     vector<string> optimalPath(const string& start, const string& end, int maxWeight) {
-//         unordered_map<string, int> dist;
-//         unordered_map<string, string> parent;
-//         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
-//         dist[start] = 0;
-
-//         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
-//         pq.push({0, start});
-
-//         while (!pq.empty()) {
-//             auto [d, current] = pq.top();
-//             pq.pop();
-//             if (current == end) break;
-
-//             for (auto& [neighbor, weight] : adj[current]) {
-//                 if (weight > maxWeight) continue; // Skip edges that don't satisfy easibility
-//                 if (dist[current] + weight < dist[neighbor]) {
-//                     dist[neighbor] = dist[current] + weight;
-//                     pq.push({dist[neighbor], neighbor});
-//                     parent[neighbor] = current;
-//                 }
-//             }
-//         }
-
-//         vector<string> path;
-//         for (string at = end; at != start; at = parent[at]) {
-//             path.push_back(at);
-//             if (parent.find(at) == parent.end()) return {}; // No path found
-//         }
-//         path.push_back(start);
-//         reverse(path.begin(), path.end());
-//         return path;
-//     }
-// };
-
-// class RoutingSystem {
-// private:
-//     Graph graph;
-// public:
-//     void updateGraph(const string& from, const string& to, int weight) {
-//         graph.addNode(from);
-//         graph.addNode(to);
-//         graph.addEdge(from, to, weight);
-//     }
-
-//     void shortestPath(const string& start, const string& end) {
-//         vector<string> path = graph.dijkstra(start, end);
-//         if (path.empty()) {
-//             cout << "No path found between " << start << " and " << end << endl;
-//         } else {
-//             cout << "Shortest path from " << start << " to " << end << ": ";
-//             for (const string& node : path) cout << node << " ";
-//             cout << endl;
-//         }
-//     }
-
-//     void calculateOptimalPath(const string& start, const string& end, int maxWeight) {
-//         vector<string> path = graph.optimalPath(start, end, maxWeight);
-//         if (path.empty()) {
-//             cout << "No optimal path found between " << start << " and " << end << " under max weight " << maxWeight << endl;
-//         } else {
-//             cout << "Optimal path (max weight " << maxWeight << ") from " << start << " to " << end << ": ";
-//             for (const string& node : path) cout << node << " ";
-//             cout << endl;
-//         }
-//     }
-// };
-
 // Graph class to represent locations and routes
-class Graph {
+class Graph
+{
 private:
     map<string, vector<pair<string, int>>> adjList; // Adjacency list: location -> [(neighbor, weight)]
 
 public:
     // Add a new location (node) to the graph
-    void addNode(const string& location) {
-        if (adjList.find(location) == adjList.end()) {
+    void addNode(const string &location)
+    {
+        if (adjList.find(location) == adjList.end())
+        {
             adjList[location] = {};
             cout << "Added location: " + location << endl;
-        } else {
+        }
+        else
+        {
             cout << "Location already exists: " + location << endl;
         }
     }
 
     // Add a route (edge) between two locations with a distance (weight)
-    void addEdge(const string& from, const string& to, int distance) {
+    void addEdge(const string &from, const string &to, int distance)
+    {
         adjList[from].push_back({to, distance});
         adjList[to].push_back({from, distance}); // Assuming undirected graph
         cout << "Added edge from " + from + " to " + to + " with distance " + to_string(distance) << endl;
     }
 
     // Dijkstra's algorithm to find shortest path between two locations
-    vector<string> dijkstra(const string& start, const string& end) {
+    vector<string> dijkstra(const string &start, const string &end)
+    {
         unordered_map<string, int> distances;
         unordered_map<string, string> previous;
         set<pair<int, string>> pq; // Min-heap: (distance, location)
 
         // Initialize distances to infinity
-        for (const auto& node : adjList) {
+        for (const auto &node : adjList)
+        {
             distances[node.first] = numeric_limits<int>::max();
         }
         distances[start] = 0;
         pq.insert({0, start});
 
-        while (!pq.empty()) {
+        while (!pq.empty())
+        {
             auto [currentDist, current] = *pq.begin();
             pq.erase(pq.begin());
 
-            if (current == end) break;
+            if (current == end)
+                break;
 
-            for (const auto& neighbor : adjList[current]) {
+            for (const auto &neighbor : adjList[current])
+            {
                 string next = neighbor.first;
                 int weight = neighbor.second;
 
-                if (distances[current] + weight < distances[next]) {
+                if (distances[current] + weight < distances[next])
+                {
                     pq.erase({distances[next], next});
                     distances[next] = distances[current] + weight;
                     previous[next] = current;
@@ -767,7 +665,8 @@ public:
 
         // Reconstruct the shortest path
         vector<string> path;
-        for (string at = end; !at.empty(); at = previous[at]) {
+        for (string at = end; !at.empty(); at = previous[at])
+        {
             path.push_back(at);
         }
         reverse(path.begin(), path.end());
@@ -775,11 +674,14 @@ public:
     }
 
     // Print graph for debugging
-    void printGraph() {
+    void printGraph()
+    {
         cout << "Graph structure:" << endl;
-        for (const auto& node : adjList) {
+        for (const auto &node : adjList)
+        {
             string output = node.first + " -> ";
-            for (const auto& neighbor : node.second) {
+            for (const auto &neighbor : node.second)
+            {
                 output += "(" + neighbor.first + ", " + to_string(neighbor.second) + ") ";
             }
             cout << output << endl;
@@ -788,43 +690,51 @@ public:
 };
 
 // RoutingSystem class to interact with Graph for path calculations
-class RoutingSystem {
+class RoutingSystem
+{
 private:
     Graph graph;
 
 public:
-    void addLocation(const string& location) {
+    void addLocation(const string &location)
+    {
         graph.addNode(location);
     }
 
-    void addRoute(const string& from, const string& to, int distance) {
+    void addRoute(const string &from, const string &to, int distance)
+    {
         graph.addEdge(from, to, distance);
     }
 
-    vector<string> calculateOptimalPath(const string& start, const string& end) {
+    vector<string> calculateOptimalPath(const string &start, const string &end)
+    {
         return graph.dijkstra(start, end);
     }
 
-    void updateGraph() {
+    void updateGraph()
+    {
         cout << "Graph updated successfully!" << endl;
     }
 
-    void printGraph() {
+    void printGraph()
+    {
         graph.printGraph();
     }
 };
 
 // RescueTeam class to manage rescue teams
-class RescueTeam {
+class RescueTeam
+{
 private:
     string teamID;
     string location;
     int capacity;
     bool availabilityStatus;
     vector<string> skills;
-    RoutingSystem* routingSystem; // Pointer to the RoutingSystem object
-    
-    struct Disaster {
+    RoutingSystem *routingSystem; // Pointer to the RoutingSystem object
+
+    struct Disaster
+    {
         string disaster_ID;
         int severity;
     };
@@ -833,47 +743,65 @@ private:
     unordered_map<string, Disaster> locationToDisaster;
 
 public:
-    RescueTeam(const string& id, const string& loc, int cap, bool status, const vector<string>& skillset, RoutingSystem* rs)
+    RescueTeam(const string &id, const string &loc, int cap, bool status, const vector<string> &skillset, RoutingSystem *rs)
         : teamID(id), location(loc), capacity(cap), availabilityStatus(status), skills(skillset), routingSystem(rs) {}
 
     // Check for active disaster at a location
-    void checkActiveDisaster(const string& loc) {
-        if (locationToDisaster.find(loc) != locationToDisaster.end()) {
+    void checkActiveDisaster(const string &loc)
+    {
+        if (locationToDisaster.find(loc) != locationToDisaster.end())
+        {
             cout << "Active disaster at " + loc + ": Disaster ID = " + locationToDisaster[loc].disaster_ID +
-                        ", Severity = " + to_string(locationToDisaster[loc].severity) << endl;
-        } else {
+                        ", Severity = " + to_string(locationToDisaster[loc].severity)
+                 << endl;
+        }
+        else
+        {
             cout << "No active disaster at " + loc << endl;
         }
     }
 
     // Update location using RoutingSystem's shortest path method
-    void updateLocation(const string& targetLocation) {
-        if (availabilityStatus) {
+    void updateLocation(const string &targetLocation)
+    {
+        if (availabilityStatus)
+        {
             vector<string> path = routingSystem->calculateOptimalPath(location, targetLocation);
-            if (!path.empty()) {
+            if (!path.empty())
+            {
                 cout << "Updating location. Shortest path: ";
-                for (size_t i = 0; i < path.size(); ++i) {
+                for (size_t i = 0; i < path.size(); ++i)
+                {
                     cout << path[i];
-                    if (i < path.size() - 1) cout << " -> ";
+                    if (i < path.size() - 1)
+                        cout << " -> ";
                 }
                 cout << endl;
                 location = targetLocation; // Update the team's location
-            } else {
+            }
+            else
+            {
                 cout << "No valid path to the target location." << endl;
             }
-        } else {
+        }
+        else
+        {
             cout << "Rescue team is not available for relocation." << endl;
         }
     }
 
     // Check availability based on skills and status
-    bool checkAvailability(const vector<string>& requiredSkills) {
-        if (!availabilityStatus) {
+    bool checkAvailability(const vector<string> &requiredSkills)
+    {
+        if (!availabilityStatus)
+        {
             cout << "Rescue team is unavailable." << endl;
             return false;
         }
-        for (const string& skill : requiredSkills) {
-            if (find(skills.begin(), skills.end(), skill) == skills.end()) {
+        for (const string &skill : requiredSkills)
+        {
+            if (find(skills.begin(), skills.end(), skill) == skills.end())
+            {
                 cout << "Rescue team lacks required skill: " + skill << endl;
                 return false;
             }
@@ -882,7 +810,6 @@ public:
         return true;
     }
 };
-
 
 class DisasterManagementSystem
 {
@@ -963,7 +890,6 @@ private:
             }
             else if (choice == 4)
             {
-                
             }
             else if (choice == 5)
             {
@@ -1135,37 +1061,6 @@ private:
         cout << GREEN << "Team assigned successfully!" << RESET << endl;
     }
 
-    //    void assignEquipment()
-    //    {
-    //        if (disasters.empty())
-    //        {
-    //            cout << RED << "No disasters to assign equipment to." << RESET << endl;
-    //            return;
-    //        }
-    //
-    //        int disasterId;
-    //        cout << "Enter disaster ID to assign equipment: ";
-    //        cin >> disasterId;
-    //
-    //        if (disasters.find(disasterId) == disasters.end())
-    //        {
-    //            cout << RED << "Invalid disaster ID." << RESET << endl;
-    //            return;
-    //        }
-    //
-    //        int equipmentId;
-    //        cout << "Enter equipment ID to assign: ";
-    //        cin >> equipmentId;
-    //
-    //        if (equipment.find(equipmentId) == equipment.end())
-    //        {
-    //            cout << RED << "Invalid equipment ID." << RESET << endl;
-    //            return;
-    //        }
-    //
-    //        disasters[disasterId].requiredResources.push_back(equipment[equipmentId].name);
-    //        cout << GREEN << "Equipment assigned successfully!" << RESET << endl;
-    //    }
 
     void viewHospitalsAndShelters()
     {
@@ -1179,23 +1074,8 @@ private:
                      << ", Location: " << hospital.location << ", Available Beds: " << hospital.availableBeds << endl;
             }
         }
-
     }
 
-    //    void citizenRequest()
-    //    {
-    //        int disasterId;
-    //        cout << "Enter disaster ID to request help: ";
-    //        cin >> disasterId;
-    //
-    //        if (disasters.find(disasterId) == disasters.end())
-    //        {
-    //            cout << RED << "Invalid disaster ID." << RESET << endl;
-    //            return;
-    //        }
-    //
-    //        cout << GREEN << "Request submitted successfully! Help is on the way!" << RESET << endl;
-    //    }
 
 public:
     DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
@@ -1281,6 +1161,105 @@ public:
         }
     }
 };
+
+class Alert
+{
+public:
+    int AlertID;
+    int DisasterID;
+    int Severity;   
+    string Message;
+    string Time;
+
+public:
+    Alert(int alertID, int disasterID, int severity, const string &message, const string &time)
+        : AlertID(alertID), DisasterID(disasterID), Severity(severity), Message(message), Time(time) {}
+
+    int getAlertID() const { return AlertID; }
+    int getDisasterID() const { return DisasterID; }
+    int getSeverity() const { return Severity; }
+    string getMessage() const { return Message; }
+    string getTime() const { return Time; }
+
+    void setSeverity(int severity) { Severity = severity; }
+    void setMessage(const string &message) { Message = message; }
+    void setTime(const string &time) { Time = time; }
+
+    friend ostream &operator<<(ostream &os, const Alert &alert)
+    {
+        os << "AlertID: " << alert.AlertID
+           << ", DisasterID: " << alert.DisasterID
+           << ", Severity: " << alert.Severity
+           << ", Message: " << alert.Message
+           << ", Time: " << alert.Time;
+        return os;
+    }
+
+    bool operator<(const Alert &other) const
+    {
+        return Severity < other.Severity; 
+    }
+};
+
+
+class AlertManager
+{
+private:
+    priority_queue<Alert> alertQueue;
+
+public:
+    void sendAlert(int alertID, int disasterID, int severity, const string &message, const string &time)
+    {
+        
+        Alert newAlert(alertID, disasterID, severity, message, time);
+        alertQueue.push(newAlert);
+        cout << "Alert sent successfully for DisasterID " << disasterID << "!" << endl;
+    }
+
+    void updateAlert(int disasterID, int severity, const string &message, const string &time)
+    {
+        vector<Alert> temp;
+        bool found = false;
+
+  
+        while (!alertQueue.empty())
+        {
+            Alert current = alertQueue.top();
+            alertQueue.pop();
+
+            if (current.getDisasterID() == disasterID)
+            {
+                current.setSeverity(severity);
+                current.setMessage(message);
+                current.setTime(time);
+                found = true;
+            }
+
+            temp.push_back(current);
+        }
+
+        for (const Alert &alert : temp)
+        {
+            alertQueue.push(alert);
+        }
+
+        if (found)
+            cout << "Alert updated successfully for DisasterID " << disasterID << "!" << endl;
+        else
+            cout << "No alert found for DisasterID " << disasterID << endl;
+    }
+
+    void displayAlerts() const
+    {
+        priority_queue<Alert> tempQueue = alertQueue; 
+        while (!tempQueue.empty())
+        {
+            cout << tempQueue.top() << endl;
+            tempQueue.pop();
+        }
+    }
+};
+
 
 class Alert
 {
@@ -1483,7 +1462,8 @@ private:
     }
 };
 
-struct Shelter {
+struct Shelter
+{
     string name;
     int capacity;
     int available_space;
@@ -1494,20 +1474,24 @@ struct Shelter {
         : name(n), capacity(cap), available_space(avail), latitude(lat), longitude(lon) {}
 };
 
-struct KDNode {
+struct KDNode
+{
     Shelter shelter;
-    KDNode* left;
-    KDNode* right;
+    KDNode *left;
+    KDNode *right;
 
     KDNode(Shelter s) : shelter(s), left(nullptr), right(nullptr) {}
 };
 
-class KDTree {
+class KDTree
+{
 private:
-    KDNode* root;
+    KDNode *root;
 
-    KDNode* insertRec(KDNode* node, Shelter shelter, unsigned depth) {
-        if (!node) return new KDNode(shelter);
+    KDNode *insertRec(KDNode *node, Shelter shelter, unsigned depth)
+    {
+        if (!node)
+            return new KDNode(shelter);
 
         unsigned cd = depth % 2;
         if ((cd == 0 && shelter.latitude < node->shelter.latitude) || (cd == 1 && shelter.longitude < node->shelter.longitude))
@@ -1518,74 +1502,95 @@ private:
         return node;
     }
 
-    double distance(double lat1, double lon1, double lat2, double lon2) {
+    double distance(double lat1, double lon1, double lat2, double lon2)
+    {
         return sqrt(pow(lat1 - lat2, 2) + pow(lon1 - lon2, 2));
     }
 
-    void searchNearestRec(KDNode* node, double lat, double lon, unsigned depth, KDNode*& best, double& bestDist) {
-        if (!node) return;
+    void searchNearestRec(KDNode *node, double lat, double lon, unsigned depth, KDNode *&best, double &bestDist)
+    {
+        if (!node)
+            return;
 
         double d = distance(lat, lon, node->shelter.latitude, node->shelter.longitude);
-        if (d < bestDist) {
+        if (d < bestDist)
+        {
             bestDist = d;
             best = node;
         }
 
         unsigned cd = depth % 2;
-        KDNode* nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
+        KDNode *nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
                                  ? node->left
                                  : node->right;
-        KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
+        KDNode *otherBranch = (nextBranch == node->left) ? node->right : node->left;
 
         searchNearestRec(nextBranch, lat, lon, depth + 1, best, bestDist);
 
         if ((cd == 0 && fabs(lat - node->shelter.latitude) < bestDist) ||
-            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist)) {
+            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist))
+        {
             searchNearestRec(otherBranch, lat, lon, depth + 1, best, bestDist);
         }
     }
 
-    KDNode* searchRec(KDNode* node, const string& name) {
-        if (!node) return nullptr;
+    KDNode *searchRec(KDNode *node, const string &name)
+    {
+        if (!node)
+            return nullptr;
 
-        if (node->shelter.name == name) return node;
+        if (node->shelter.name == name)
+            return node;
 
-        KDNode* leftResult = searchRec(node->left, name);
-        if (leftResult) return leftResult;
+        KDNode *leftResult = searchRec(node->left, name);
+        if (leftResult)
+            return leftResult;
 
         return searchRec(node->right, name);
     }
-    KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
-        if (!node) return nullptr;
+    KDNode *findMin(KDNode *node, unsigned d, unsigned depth)
+    {
+        if (!node)
+            return nullptr;
 
         unsigned cd = depth % 2;
-        if (cd == d) {
-            if (!node->left) return node;
+        if (cd == d)
+        {
+            if (!node->left)
+                return node;
             return findMin(node->left, d, depth + 1);
         }
 
-        KDNode* leftMin = findMin(node->left, d, depth + 1);
-        KDNode* rightMin = findMin(node->right, d, depth + 1);
+        KDNode *leftMin = findMin(node->left, d, depth + 1);
+        KDNode *rightMin = findMin(node->right, d, depth + 1);
 
-        KDNode* minNode = node;
-        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude) minNode = leftMin;
-        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude) minNode = rightMin;
+        KDNode *minNode = node;
+        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude)
+            minNode = leftMin;
+        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude)
+            minNode = rightMin;
 
         return minNode;
     }
 
+    KDNode *deleteRec(KDNode *node, const string &name, unsigned depth)
+    {
+        if (!node)
+            return nullptr;
 
-    KDNode* deleteRec(KDNode* node, const string& name, unsigned depth) {
-        if (!node) return nullptr;
+        if (node->shelter.name == name)
+        {
+            if (!node->right)
+                return node->left;
+            if (!node->left)
+                return node->right;
 
-        if (node->shelter.name == name) {
-            if (!node->right) return node->left;
-            if (!node->left) return node->right;
-
-            KDNode* minNode = findMin(node->right, depth % 2, depth + 1);
+            KDNode *minNode = findMin(node->right, depth % 2, depth + 1);
             node->shelter = minNode->shelter;
             node->right = deleteRec(node->right, minNode->shelter.name, depth + 1);
-        } else {
+        }
+        else
+        {
             unsigned cd = depth % 2;
             if ((cd == 0 && name < node->shelter.name) || (cd == 1 && name < node->shelter.name))
                 node->left = deleteRec(node->left, name, depth + 1);
@@ -1595,9 +1600,10 @@ private:
         return node;
     }
 
-  
-    void displaySheltersRec(KDNode* node) {
-        if (!node) return;
+    void displaySheltersRec(KDNode *node)
+    {
+        if (!node)
+            return;
 
         cout << "Shelter Name: " << node->shelter.name
              << ", Capacity: " << node->shelter.capacity
@@ -1611,48 +1617,56 @@ private:
 public:
     KDTree() : root(nullptr) {}
 
-    void addShelter(Shelter shelter) {
+    void addShelter(Shelter shelter)
+    {
         root = insertRec(root, shelter, 0);
     }
 
-    void updateShelter(const string& name, int newCapacity, int newAvailableSpace) {
-        KDNode* node = searchRec(root, name);
-        if (!node) throw runtime_error("Shelter not found.");
+    void updateShelter(const string &name, int newCapacity, int newAvailableSpace)
+    {
+        KDNode *node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
         node->shelter.capacity = newCapacity;
         node->shelter.available_space = newAvailableSpace;
     }
 
-    void deleteShelter(const string& name) {
+    void deleteShelter(const string &name)
+    {
         root = deleteRec(root, name, 0);
     }
 
-    Shelter searchNearestShelter(double lat, double lon) {
-        KDNode* best = nullptr;
+    Shelter searchNearestShelter(double lat, double lon)
+    {
+        KDNode *best = nullptr;
         double bestDist = numeric_limits<double>::max();
         searchNearestRec(root, lat, lon, 0, best, bestDist);
-        if (best) return best->shelter;
+        if (best)
+            return best->shelter;
         throw runtime_error("No shelter found.");
     }
 
-    int getAvailableSpace(const string& name) {
-        KDNode* node = searchRec(root, name);
-        if (!node) throw runtime_error("Shelter not found.");
+    int getAvailableSpace(const string &name)
+    {
+        KDNode *node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
         return node->shelter.available_space;
     }
 
-    pair<double, double> getLocation(const string& name) {
-        KDNode* node = searchRec(root, name);
-        if (!node) throw runtime_error("Shelter not found.");
+    pair<double, double> getLocation(const string &name)
+    {
+        KDNode *node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
         return {node->shelter.latitude, node->shelter.longitude};
     }
 
-    void displayShelters() {
+    void displayShelters()
+    {
         displaySheltersRec(root);
     }
 };
-
-
-       
 
 int main()
 {
