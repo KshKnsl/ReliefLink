@@ -1306,7 +1306,6 @@ public:
 };
 
 
-
 int main()
 {
     Trie trie;
