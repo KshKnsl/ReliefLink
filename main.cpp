@@ -1322,107 +1322,176 @@ private:
     }
 };
 
-struct Point
-{
-    double x;
-    double y;
-    string shelter_name;
+struct Shelter {
+    string name;
+    int capacity;
+    int available_space;
+    double latitude;
+    double longitude;
 
-    Point(double _x, double _y, string _shelter_name)
-        : x(_x), y(_y), shelter_name(_shelter_name) {}
+    Shelter(string n, int cap, int avail, double lat, double lon)
+        : name(n), capacity(cap), available_space(avail), latitude(lat), longitude(lon) {}
 };
 
-struct KDNode
-{
-    Point point;
-    KDNode *left;
-    KDNode *right;
+struct KDNode {
+    Shelter shelter;
+    KDNode* left;
+    KDNode* right;
 
-    KDNode(Point p) : point(p), left(nullptr), right(nullptr) {}
+    KDNode(Shelter s) : shelter(s), left(nullptr), right(nullptr) {}
 };
 
-class KDTree
-{
+class KDTree {
 private:
-    KDNode *root;
+    KDNode* root;
 
-    KDNode *insertRec(KDNode *node, Point point, unsigned depth)
-    {
-        if (!node)
-            return new KDNode(point);
+    KDNode* insertRec(KDNode* node, Shelter shelter, unsigned depth) {
+        if (!node) return new KDNode(shelter);
 
         unsigned cd = depth % 2;
-
-        if (cd == 0)
-        {
-            if (point.x < node->point.x)
-                node->left = insertRec(node->left, point, depth + 1);
-            else
-                node->right = insertRec(node->right, point, depth + 1);
-        }
+        if ((cd == 0 && shelter.latitude < node->shelter.latitude) || (cd == 1 && shelter.longitude < node->shelter.longitude))
+            node->left = insertRec(node->left, shelter, depth + 1);
         else
-        {
-            if (point.y < node->point.y)
-                node->left = insertRec(node->left, point, depth + 1);
-            else
-                node->right = insertRec(node->right, point, depth + 1);
-        }
+            node->right = insertRec(node->right, shelter, depth + 1);
 
         return node;
     }
 
-    void nearestNeighbor(KDNode *node, Point target, unsigned depth, KDNode *&best, double &bestDist)
-    {
-        if (!node)
-            return;
+    double distance(double lat1, double lon1, double lat2, double lon2) {
+        return sqrt(pow(lat1 - lat2, 2) + pow(lon1 - lon2, 2));
+    }
 
-        double dist = distance(node->point, target);
+    void searchNearestRec(KDNode* node, double lat, double lon, unsigned depth, KDNode*& best, double& bestDist) {
+        if (!node) return;
 
-        if (dist < bestDist)
-        {
+        double d = distance(lat, lon, node->shelter.latitude, node->shelter.longitude);
+        if (d < bestDist) {
+            bestDist = d;
             best = node;
-            bestDist = dist;
         }
 
         unsigned cd = depth % 2;
-        KDNode *primary = (cd == 0 ? (target.x < node->point.x ? node->left : node->right)
-                                   : (target.y < node->point.y ? node->left : node->right));
-        KDNode *secondary = (primary == node->left ? node->right : node->left);
+        KDNode* nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
+                                 ? node->left
+                                 : node->right;
+        KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
 
-        nearestNeighbor(primary, target, depth + 1, best, bestDist);
+        searchNearestRec(nextBranch, lat, lon, depth + 1, best, bestDist);
 
-        double splitDist = (cd == 0 ? fabs(target.x - node->point.x) : fabs(target.y - node->point.y));
-        if (splitDist < bestDist)
-        {
-            nearestNeighbor(secondary, target, depth + 1, best, bestDist);
+        if ((cd == 0 && fabs(lat - node->shelter.latitude) < bestDist) ||
+            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist)) {
+            searchNearestRec(otherBranch, lat, lon, depth + 1, best, bestDist);
         }
     }
 
-    double distance(Point a, Point b)
-    {
-        return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    KDNode* searchRec(KDNode* node, const string& name) {
+        if (!node) return nullptr;
+
+        if (node->shelter.name == name) return node;
+
+        KDNode* leftResult = searchRec(node->left, name);
+        if (leftResult) return leftResult;
+
+        return searchRec(node->right, name);
+    }
+    KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
+        if (!node) return nullptr;
+
+        unsigned cd = depth % 2;
+        if (cd == d) {
+            if (!node->left) return node;
+            return findMin(node->left, d, depth + 1);
+        }
+
+        KDNode* leftMin = findMin(node->left, d, depth + 1);
+        KDNode* rightMin = findMin(node->right, d, depth + 1);
+
+        KDNode* minNode = node;
+        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude) minNode = leftMin;
+        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude) minNode = rightMin;
+
+        return minNode;
+    }
+
+
+    KDNode* deleteRec(KDNode* node, const string& name, unsigned depth) {
+        if (!node) return nullptr;
+
+        if (node->shelter.name == name) {
+            if (!node->right) return node->left;
+            if (!node->left) return node->right;
+
+            KDNode* minNode = findMin(node->right, depth % 2, depth + 1);
+            node->shelter = minNode->shelter;
+            node->right = deleteRec(node->right, minNode->shelter.name, depth + 1);
+        } else {
+            unsigned cd = depth % 2;
+            if ((cd == 0 && name < node->shelter.name) || (cd == 1 && name < node->shelter.name))
+                node->left = deleteRec(node->left, name, depth + 1);
+            else
+                node->right = deleteRec(node->right, name, depth + 1);
+        }
+        return node;
+    }
+
+  
+    void displaySheltersRec(KDNode* node) {
+        if (!node) return;
+
+        cout << "Shelter Name: " << node->shelter.name
+             << ", Capacity: " << node->shelter.capacity
+             << ", Available Space: " << node->shelter.available_space
+             << ", Location: (" << node->shelter.latitude << ", " << node->shelter.longitude << ")" << endl;
+
+        displaySheltersRec(node->left);
+        displaySheltersRec(node->right);
     }
 
 public:
     KDTree() : root(nullptr) {}
 
-    void insert(Point point)
-    {
-        root = insertRec(root, point, 0);
+    void addShelter(Shelter shelter) {
+        root = insertRec(root, shelter, 0);
     }
 
-    string findNearest(Point target)
-    {
-        KDNode *best = nullptr;
+    void updateShelter(const string& name, int newCapacity, int newAvailableSpace) {
+        KDNode* node = searchRec(root, name);
+        if (!node) throw runtime_error("Shelter not found.");
+        node->shelter.capacity = newCapacity;
+        node->shelter.available_space = newAvailableSpace;
+    }
+
+    void deleteShelter(const string& name) {
+        root = deleteRec(root, name, 0);
+    }
+
+    Shelter searchNearestShelter(double lat, double lon) {
+        KDNode* best = nullptr;
         double bestDist = numeric_limits<double>::max();
+        searchNearestRec(root, lat, lon, 0, best, bestDist);
+        if (best) return best->shelter;
+        throw runtime_error("No shelter found.");
+    }
 
-        nearestNeighbor(root, target, 0, best, bestDist);
+    int getAvailableSpace(const string& name) {
+        KDNode* node = searchRec(root, name);
+        if (!node) throw runtime_error("Shelter not found.");
+        return node->shelter.available_space;
+    }
 
-        if (best)
-            return best->point.shelter_name;
-        return "No shelters found";
+    pair<double, double> getLocation(const string& name) {
+        KDNode* node = searchRec(root, name);
+        if (!node) throw runtime_error("Shelter not found.");
+        return {node->shelter.latitude, node->shelter.longitude};
+    }
+
+    void displayShelters() {
+        displaySheltersRec(root);
     }
 };
+
+
+       
 
 int main()
 {
