@@ -138,9 +138,9 @@ public:
     template <typename T>
     friend class BPlusTree;
     friend class DisasterManagementSystem;
-    friend ostream &operator<<(ostream &os, Location &loc);
+    friend ostream &operator<<(ostream &os, const Location &loc);
 };
-ostream &operator<<(ostream &os, Location &loc)
+ostream &operator<<(ostream &os, const Location &loc)
 {
     os << loc.address << ", " << loc.city << ", " << loc.state << " (" << loc.latitude << ", " << loc.longitude << ")";
     return os;
@@ -184,19 +184,19 @@ public:
     friend class DisasterManagementSystem;
     template <typename T>
     friend class HashTable;
-    friend ostream &operator<<(ostream &os, Disaster &D);
+    friend ostream &operator<<(ostream &os,const Disaster *D);
 };
-ostream &operator<<(ostream &os, Disaster &D)
+ostream &operator<<(ostream &os,const Disaster *D)
 {
-    os << "ID: " << D.id << endl;
-    os<<"Type: " << D.type<<endl;
-    os<< "Status: " << D.status <<endl;
-    os<<"Severity: " << D.severity<<endl;
-    os<<"Date Of Disaster: "<<D.date<<endl;
-    os<< "Affected Population: " << D.affectedPopulation << endl;
-    os<<"Location: "<<D.location<<endl;
+    os<< "ID: " << D->id << endl;
+    os<<"Type: " << D->type<<endl;
+    os<< "Status: " << D->status <<endl;
+    os<<"Severity: " << D->severity<<endl;
+    os<<"Date Of Disaster: "<<D->date<<endl;
+    os<< "Affected Population: " << D->affectedPopulation << endl;
+    os<<"Location: "<<D->location<<endl;
     os<<"Assigned Rescue Teams: ";
-    for(auto k:D.assignedTeams){
+    for(auto k:D->assignedTeams){
         os<<k<<" ";
     }
     return os;
@@ -258,7 +258,7 @@ public:
         }
     }
     void IncreaseSize(int newSize) {
-        vector<T> oldTable = V;
+        vector<T*> oldTable = V;
         size = newSize;
         V.clear();
         V.resize(size, nullptr);
@@ -310,7 +310,7 @@ public:
     {
     private:
         bool isLeaf;
-        vector<T> keys;
+        vector<T*> keys;
         vector<Node *> children;
         Node *next;
         
@@ -345,24 +345,26 @@ public:
     }
     
     // Implementation of insertNonFull function
-    void insertNonFull(Node *node, T key)
+    void insertNonFull(Node *node, T *key)
     {
         if (node->isLeaf)
         {
-            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key), key);
+            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key, [](const T* a, const T* b) {
+                return a->id < b->id;
+            }), key);
         }
         else
         {
             int i = node->keys.size() - 1;
-            while (i >= 0 && key < node->keys[i])
+            while (i >= 0 && key->id < node->keys[i]->id)
             {
                 i--;
             }
             i++;
-            if (node->children[i]->keys.size() == 2 * t - 1)
+            if ((int) node->children[i]->keys.size() == 2 * t - 1)
             {
                 splitChild(node, i, node->children[i]);
-                if (key > node->keys[i])
+                if (key->id > node->keys[i]->id)
                 {
                     i++;
                 }
@@ -503,9 +505,9 @@ public:
     {
         if (node != nullptr)
         {
-            for (const T &key : node->keys)
+            for (const T *key : node->keys)
             {
-                cout << key << " ";
+                cout << &*key << " ";
             }
             for (Node *child : node->children)
             {
@@ -517,9 +519,9 @@ public:
     {
         if (node != nullptr)
         {
-            for (const T &key : node->keys)
+            for (const T *key : node->keys)
             {
-                if(key.status=="Active"){
+                if(key->status=="Active"){
                     H->Insert(key);
                 }
             }
@@ -545,13 +547,13 @@ public:
         while (current != nullptr)
         {
             int i = 0;
-            while (i < current->keys.size() && key > current->keys[i])
+            while (i < current->keys.size() && key > current->keys[i]->id)
             {
                 i++;
             }
-            if (i < current->keys.size() && key == current->keys[i])
+            if (i < current->keys.size() && key == current->keys[i]->id)
             {
-                return key;
+                return current->keys[i];
             }
             if (current->isLeaf)
             {
@@ -563,7 +565,7 @@ public:
     }
     
     // Implementation of insert function
-    void insert(T key)
+    void insert(T *key)
     {
         if (root == nullptr)
         {
@@ -572,7 +574,7 @@ public:
         }
         else
         {
-            if (root->keys.size() == 2 * t - 1)
+            if ((int)root->keys.size() == 2 * t - 1)
             {
                 Node *newRoot = new Node();
                 newRoot->children.push_back(root);
@@ -600,7 +602,7 @@ public:
     }
     
     
-    void AddActiveDisaster(HashTable<T> H)
+    void AddActiveDisaster(HashTable<T> *H)
     {
         AddDisasterToHash(H, root, 0);
     }
@@ -853,7 +855,7 @@ private:
         cin >> affectedPopulation;
         
         Location loc = {latitude, longitude, address, city, state};
-        Disaster D(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
+        Disaster *D=new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
         disasters->insert(D);
         cout << GREEN << "Disaster reported successfully!" << RESET << endl;
     }
