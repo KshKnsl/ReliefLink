@@ -1,6 +1,24 @@
-#include <stdexcept>
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+#include <iomanip>
+#include <ctime>
+#include <algorithm>
+#include <thread>
+#include <stack>
+#include <list>
+#include <set>
+#include <unordered_map>
+#include <climits>
+#include <cmath>
 #include <unistd.h>
+#include <stdexcept>
+
 
 using namespace std;
 
@@ -93,11 +111,18 @@ private:
     string state;
 
 public:
+    // Default Constructor
     Location() : latitude(0.0), longitude(0.0), address(""), city(""), state("") {}
+
+    // Parameterized Constructor
     Location(double latitude, double longitude, const string &address, const string &city, const string &state)
         : latitude(latitude), longitude(longitude), address(address), city(city), state(state) {}
+
+    // Copy Constructor
     Location(const Location &other)
         : latitude(other.latitude), longitude(other.longitude), address(other.address), city(other.city), state(other.state) {}
+
+    // Overloaded Assignment Operator
     Location &operator=(const Location &other)
     {
         if (this != &other)
@@ -121,6 +146,7 @@ ostream &operator<<(ostream &os, const Location &loc)
     os << loc.address << ", " << loc.city << ", " << loc.state << " (" << loc.latitude << ", " << loc.longitude << ")";
     return os;
 }
+
 class Disaster
 {
 private:
@@ -135,6 +161,7 @@ private:
     vector<string> requiredResources;
 
 public:
+    // Constructor for convenience
     Disaster() {}
     Disaster(int id, const string &type, const Location &location, int severity,
              const string &status, const string &date, int affectedPopulation,
@@ -349,7 +376,7 @@ public:
         else
         {
             int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
-            if (idx < node->keys.size() && node->id == key)
+            if (idx < node->keys.size() && node->keys[idx]->id == key)
             {
                 if (node->children[idx]->keys.size() >= t)
                 {
@@ -358,8 +385,8 @@ public:
                     {
                         predNode = predNode->children.back();
                     }
-                    T pred = predNode->keys.back();
-                    node->id = pred;
+                    T* pred = predNode->keys.back();
+                    node->keys[idx] = pred;
                     remove(node->children[idx], pred);
                 }
                 else if (node->children[idx + 1]->keys.size() >= t)
@@ -369,8 +396,8 @@ public:
                     {
                         succNode = succNode->children.front();
                     }
-                    T succ = succNode->keys.front();
-                    node->id = succ;
+                    T* succ = succNode->keys.front();
+                    node->keys[idx] = succ;
                     remove(node->children[idx + 1], succ);
                 }
                 else
@@ -615,9 +642,7 @@ public:
 
         while (!pq.empty())
         {
-            auto currentPair = *pq.begin();
-            int currentDist = currentPair.first;
-            string current = currentPair.second;
+            auto [currentDist, current] = *pq.begin();
             pq.erase(pq.begin());
 
             if (current == end)
@@ -794,7 +819,6 @@ private:
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
-    RoutingSystem routingSystem;               // Add RoutingSystem member
 
     int currentDisasterId;
     int currentTeamId;
@@ -833,207 +857,179 @@ private:
         cout << "\nWelcome to Relief Link! How can we help you?" << endl;
         cout << "1. Login as Admin" << endl;
         cout << "2. Login as Rescue Team" << endl;
-        cout << "3. Request Help (Citizen)" << endl;
-        cout << "4. Exit" << endl;
+        cout << "3. Report Disaster" << endl;
+        cout << "4. Request Help (Citizen)" << endl;
+        cout << "5. Exit" << endl;
     }
-    void showAdminMenu()
+    void adminMenu()
     {
         changeColor();
-        cout << "\nAdmin Menu:" << endl;
-        cout << "1. Add Disaster" << endl;
-        cout << "2. Update Disaster" << endl;
-        cout << "3. Delete Disaster" << endl;
-        cout << "4. Add Rescue Team" << endl;
-        cout << "5. Update Rescue Team" << endl;
-        cout << "6. Delete Rescue Team" << endl;
-        cout << "7. Add Relief Camp" << endl;
-        cout << "8. Update Relief Camp" << endl;
-        cout << "9. Delete Relief Camp" << endl;
-        cout << "10. Search Relief Camp" << endl;
-        cout << "11. Display All Relief Camps" << endl;
-        cout << "12. Logout" << endl;
-        int adminChoice;
-        cin >> adminChoice;
-        switch (adminChoice)
+        while (true)
         {
-        case 1:
-            addDisaster();
-            break;
-        case 2:
-            updateDisaster();
-            break;
-        case 3:
-            deleteDisaster();
-            break;
-        case 4:
-            addRescueTeam();
-            break;
-        case 5:
-            updateRescueTeam();
-            break;
-        case 6:
-            deleteRescueTeam();
-            break;
-        case 7: 
-            addReliefCamp();
-            break;
-        case 8:
-            updateReliefCamp();
-            break;
-        case 9:
-            deleteReliefCamp();
-            break;
-        case 10:
-            searchReliefCamp();
-            break;
+            cout << "\nAdmin Menu:" << endl;
+            cout << "1. Report Disaster" << endl;
+            cout << "2. View All Disasters" << endl;
+            cout << "3. View and Assign Teams to Disasters" << endl;
+            cout << "4. View and Assign Equipment to Teams" << endl;
+            cout << "5. View Hospitals and Shelters" << endl;
+            cout << "6. Logout OR Exit" << endl;
+            int choice;
+            cin >> choice;
 
-        case 11:
-            displayAllReliefCamps();
-            break;
-        case 12:
-            isLoggedIn = 0;
-            break;
-        default:
-            cout << RED << "Invalid choice, please try again." << RESET << endl;
+            if (choice == 1)
+            {
+                reportDisaster();
+            }
+            else if (choice == 2)
+            {
+                viewAllDisasters();
+            }
+            else if (choice == 3)
+            {
+                assignTeams();
+            }
+            else if (choice == 4)
+            {
+            }
+            else if (choice == 5)
+            {
+                viewHospitalsAndShelters();
+            }
+            else if (choice == 6)
+            {
+                isLoggedIn = 0;
+                currentUser = "";
+                cout << GREEN << "Logged out successfully!" << RESET << endl;
+                sleep(2);
+                changeColor();
+                break;
+            }
+            else
+            {
+                cout << RED << "Invalid choice, please try again." << RESET << endl;
+            }
         }
     }
-    void showRescueTeamMenu()
-    {
-        cout << "\nRescue Team Menu:" << endl;
-        cout << "1. View Active Disasters" << endl;
-        cout << "2. Respond to Alert Calls" << endl;
-        cout << "3. Logout" << endl;
-        int rescueTeamChoice;
 
-        cin >> rescueTeamChoice;
-        switch (rescueTeamChoice)
-        {
-        case 1:
-            viewActiveDisasters();
-            break;
-        case 2:
-            respondToAlertCalls();
-            break;
-        case 3:
-            isLoggedIn = 0;
-            break;
-        default:
-            cout << RED << "Invalid choice, please try again." << RESET << endl;
-        }
-    }
-    void showCitizenMenu()
+    void reportDisaster()
     {
-        cout << "\nCitizen Help Menu:" << endl;
-        cout << "1. Request Help" << endl;
-        cout << "2. Exit" << endl;
-        int citizenChoice;
-        cin >> citizenChoice;
-        switch (citizenChoice)
-        {
-        case 1:
-            requestHelp();
-            break;
-        case 2:
-            break;
-        default:
-            cout << RED << "Invalid choice, please try again." << RESET << endl;
-        }
-    }
-    void addDisaster()
-    {
-        string type, status, date, address, city, state;
-        double lat, lon;
-        int severity, affected_population;
+        string disasterType, status, date;
+        double latitude, longitude;
+        int severity, affectedPopulation;
+        string address, city, state;
 
-        cout << "Enter Disaster Type: ";
-        cin >> type;
-        cout << "Enter Status: ";
+        cout << "Enter disaster type: ";
+        cin >> disasterType;
+        cout << "Enter status (e.g., ongoing, resolved): ";
         cin >> status;
-        cout << "Enter Date (YYYY-MM-DD): ";
+        cout << "Enter date (YYYY-MM-DD): ";
         cin >> date;
-        cout << "Enter Location (latitude longitude): ";
-        cin >> lat >> lon;
+        cout << "Enter latitude and longitude of disaster: ";
+        cin >> latitude >> longitude;
         cout << "Enter Address: ";
-        cin.ignore();
-        getline(cin, address);
+        cin >> address;
         cout << "Enter City: ";
-        getline(cin, city);
+        cin >> city;
         cout << "Enter State: ";
-        getline(cin, state);
-        cout << "Enter Severity (1-5): ";
+        cin >> state;
+        cout << "Enter severity (1 to 5): ";
         cin >> severity;
-        cout << "Enter Affected Population: ";
-        cin >> affected_population;
+        cout << "Enter affected population: ";
+        cin >> affectedPopulation;
 
-        Location loc(lat, lon, address, city, state);
-        Disaster *d = new Disaster(currentDisasterId++, type, loc, severity, status, date, affected_population, {}, {});
-        disasters->insert(d);
-        cout << GREEN << "Disaster added successfully!" << RESET << endl;
+        Location loc(latitude, longitude, address, city, state);
+        Disaster *D = new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
+        disasters->insert(D);
+        cout << GREEN << "Disaster reported successfully!" << RESET << endl;
     }
-    void updateDisaster()
+
+    void viewAllDisasters()
     {
-        int id;
-        cout << "Enter Disaster ID: ";
-        cin >> id;
-        Disaster *d = disasters->search(id);
-        if (d == nullptr)
-        {
-            cout << RED << "Disaster not found." << RESET << endl;
-            return;
-        }
-        cout << "Enter new Status: ";
-        cin >> d->status;
-        cout << "Enter new Severity: ";
-        cin >> d->severity;
-        cout << GREEN << "Disaster updated successfully!" << RESET << endl;
-    }
-    // void deleteDisaster()
-    // {
-    //     int id;
-    //     cout << "Enter Disaster ID: ";
-    //     cin >> id;
-    //     disasters->remove(id);
-    //     cout << GREEN << "Disaster deleted successfully!" << RESET << endl;
-    // }
-    void viewActiveDisasters()
-    {
-        cout << "\nActive Disasters:" << endl;
+        cout << "Disasters Reported:" << endl;
         disasters->printTree();
     }
-    void respondToAlertCalls()
+
+    void UpdateStatus()
     {
-        if (alertQueue.empty())
+        if (disasters == NULL)
         {
-            cout << "No active alerts." << endl;
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
         }
-        pair<int, int> alert = alertQueue.top();
-        alertQueue.pop();
-        cout << "Responding to alert call for Disaster ID: " << alert.second << endl;
-    }
-    void requestHelp()
-    {
-        string location;
-        cout << "Enter your location: ";
-        vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
-        if (!path.empty())
+
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
-            cout << "Help is on the way! Shortest path: ";
-            for (size_t i = 0; i < path.size(); ++i)
-            {
-                cout << path[i];
-                if (i < path.size() - 1)
-                    cout << " -> ";
-            }
-            cout << endl;
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
         }
-        else
-        {
-            cout << "No valid path to the nearest relief camp." << endl;
-        }
+
+        string status;
+        cout << "Enter Updated Status: ";
+        cin >> status;
+        find->status = status;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
 
-void assignTeams()
+    void UpdateSeverity()
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+
+        int severity;
+        cout << "Enter Updated Severity: ";
+        cin >> severity;
+        find->severity = severity;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
+    }
+
+    void UpdateLocation(int Did, Location L)
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+        double latitude, longitude;
+        string address, city, state;
+        cout << "Enter latitude and longitude of disaster: ";
+        cin >> latitude >> longitude;
+        cout << "Enter Address: ";
+        cin >> address;
+        cout << "Enter City: ";
+        cin >> city;
+        cout << "Enter State: ";
+        cin >> state;
+        Location loc(latitude, longitude, address, city, state);
+        find->location = loc;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
+    }
+
+    void assignTeams()
     {
         if (disasters == NULL)
         {
@@ -1080,6 +1076,7 @@ void assignTeams()
         }
     }
 
+
 public:
     DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
@@ -1091,69 +1088,75 @@ public:
     {
         while (true)
         {
-            if (isLoggedIn == 0)
+            showMenu();
+            int choice;
+            cin >> choice;
+
+            if (choice == 1)
             {
-                showMenu();
-                int choice;
-                cin >> choice;
+                // Admin login
+                string username, password;
+                cout << "Enter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
 
-                if (choice == 1)
+                if (users.find(username) != users.end() && users[username] == password)
                 {
-                    // Admin login
-                    string username, password;
-                    cout << "Enter username: ";
-                    cin >> username;
-                    cout << "Enter password: ";
-                    cin >> password;
-
-                    if (users.find(username) != users.end() && users[username] == password)
-                    {
-                        isLoggedIn = 1;
-                        currentUser = username;
-                        cout << GREEN << "Login successful!" << RESET << endl;
-                        sleep(2);
-                        showAdminMenu();
-                    }
-                    else
-                    {
-                        cout << RED << "Invalid credentials. Try again." << RESET << endl;
-                    }
-                }
-                else if (choice == 2)
-                {
-                    // Rescue Team login
-                    string username, password;
-                    cout << "Enter username: ";
-                    cin >> username;
-                    cout << "Enter password: ";
-                    cin >> password;
-
-                    if (RescueUsers.find(username) != RescueUsers.end() && RescueUsers[username] == password)
-                    {
-                        isLoggedIn = 2;
-                        currentUser = username;
-                        cout << GREEN << "Login successful!" << RESET << endl;
-                        sleep(2);
-                        showRescueTeamMenu();
-                    }
-                    else
-                    {
-                        cout << RED << "Invalid credentials. Try again." << RESET << endl;
-                    }
-                }
-                else if (choice == 3)
-                {
-                    // Citizen help request
-                    requestHelp();
-                }
-                else if (choice == 4)
-                {
-                    break;
+                    isLoggedIn = 1;
+                    currentUser = username;
+                    cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
+                    adminMenu();
                 }
                 else
                 {
-                    cout << RED << "Invalid choice, please try again." << RESET << endl;
+                    cout << RED << "Invalid credentials. Try again." << RESET << endl;
                 }
+            }
+            else if (choice == 2)
+            {
+                // Rescue Team login
+                string username, password;
+                cout << "Enter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+
+                if (RescueUsers.find(username) != RescueUsers.end() && RescueUsers[username] == password)
+                {
+                    isLoggedIn = 2;
+                    currentUser = username;
+                    cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
+                }
+                else
+                {
+                    cout << RED << "Invalid credentials. Try again." << RESET << endl;
+                }
+            }
+            else if (choice == 3)
+            {
+                // Report Disaster (for admin)
+                if (!isLoggedIn)
+                {
+                    cout << RED << "You must be logged in as an admin to report a disaster." << RESET << endl;
+                    continue;
+                }
+                reportDisaster();
+            }
+            else if (choice == 4)
+            {
+                // Citizen Request (no login required)
+                //                citizenRequest();
+            }
+            else if (choice == 5)
+            {
+                return;
+            }
+            else
+            {
+                cout << RED << "Invalid choice, please try again." << RESET << endl;
             }
         }
     }
@@ -1198,6 +1201,7 @@ public:
     }
 };
 
+
 class AlertManager
 {
 private:
@@ -1206,7 +1210,7 @@ private:
 public:
     void sendAlert(int alertID, int disasterID, int severity, const string &message, const string &time)
     {
-
+        
         Alert newAlert(alertID, disasterID, severity, message, time);
         alertQueue.push(newAlert);
         cout << "Alert sent successfully for DisasterID " << disasterID << "!" << endl;
@@ -1217,6 +1221,7 @@ public:
         vector<Alert> temp;
         bool found = false;
 
+  
         while (!alertQueue.empty())
         {
             Alert current = alertQueue.top();
@@ -1254,6 +1259,7 @@ public:
         }
     }
 };
+
 class MaxHeap
 {
 private:
