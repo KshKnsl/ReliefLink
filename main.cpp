@@ -1261,40 +1261,6 @@ public:
 };
 
 
-class Alert
-{
-private:
-    int AlertID;
-    int DisasterID;
-    int Severity;
-    string Message;
-    string Time;
-
-public:
-    Alert(int alertID, int disasterID, int severity, string message, string time)
-    {
-        AlertID = alertID;
-        DisasterID = disasterID;
-        Severity = severity;
-        Message = message;
-        Time = time;
-    }
-
-    int getSeverity() const { return Severity; }
-    string getMessage() const { return Message; }
-    string getTime() const { return Time; }
-    int getAlertID() const { return AlertID; }
-
-    friend ostream &operator<<(ostream &os, const Alert &alert)
-    {
-        os << "AlertID: " << alert.AlertID
-           << ", DisasterID: " << alert.DisasterID
-           << ", Severity: " << alert.Severity
-           << ", Message: " << alert.Message
-           << ", Time: " << alert.Time;
-        return os;
-    }
-};
 
 class MaxHeap
 {
