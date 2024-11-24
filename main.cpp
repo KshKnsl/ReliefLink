@@ -527,7 +527,7 @@ public:
             }
             for (Node *child : node->children)
             {
-                AddDisasterToHash<T>(H,child,level + 1);
+                AddDisasterToHash(H,child,level + 1);
             }
         }
     }
@@ -854,7 +854,7 @@ private:
         cout << "Enter affected population: ";
         cin >> affectedPopulation;
         
-        Location loc = {latitude, longitude, address, city, state};
+        Location loc(latitude, longitude, address, city, state);
         Disaster *D=new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
         disasters->insert(D);
         cout << GREEN << "Disaster reported successfully!" << RESET << endl;
@@ -950,7 +950,7 @@ private:
         cin >> city;
         cout << "Enter State: ";
         cin >> state;
-        Location loc = {latitude, longitude, address, city, state};
+        Location loc(latitude, longitude, address, city, state);
         find->location=loc;
         cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
