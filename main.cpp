@@ -349,7 +349,7 @@ public:
         else
         {
             int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
-            if (idx < node->keys.size() && node->keys[idx] == key)
+            if (idx < node->keys.size() && node->id == key)
             {
                 if (node->children[idx]->keys.size() >= t)
                 {
@@ -359,7 +359,7 @@ public:
                         predNode = predNode->children.back();
                     }
                     T pred = predNode->keys.back();
-                    node->keys[idx] = pred;
+                    node->id = pred;
                     remove(node->children[idx], pred);
                 }
                 else if (node->children[idx + 1]->keys.size() >= t)
@@ -370,7 +370,7 @@ public:
                         succNode = succNode->children.front();
                     }
                     T succ = succNode->keys.front();
-                    node->keys[idx] = succ;
+                    node->id = succ;
                     remove(node->children[idx + 1], succ);
                 }
                 else
@@ -890,7 +890,6 @@ private:
         case 11:
             displayAllReliefCamps();
             break;
-
         case 12:
             isLoggedIn = 0;
             break;
@@ -988,14 +987,14 @@ private:
         cin >> d->severity;
         cout << GREEN << "Disaster updated successfully!" << RESET << endl;
     }
-    void deleteDisaster()
-    {
-        int id;
-        cout << "Enter Disaster ID: ";
-        cin >> id;
-        disasters->remove(id);
-        cout << GREEN << "Disaster deleted successfully!" << RESET << endl;
-    }
+    // void deleteDisaster()
+    // {
+    //     int id;
+    //     cout << "Enter Disaster ID: ";
+    //     cin >> id;
+    //     disasters->remove(id);
+    //     cout << GREEN << "Disaster deleted successfully!" << RESET << endl;
+    // }
     void viewActiveDisasters()
     {
         cout << "\nActive Disasters:" << endl;
