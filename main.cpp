@@ -195,18 +195,7 @@ struct RescueTeam
     vector<int> equippedWith;
 };
 
-struct Shelter
-{
-    int id;
-    string name;
-    Location location;
-    int capacity;
-    int currentOccupancy;
-    bool hasFirstAid;
-    bool hasFood;
-    bool hasPower;
-    vector<string> facilities;
-};
+
 
 template <typename T>
 class HashTable
