@@ -874,7 +874,7 @@ private:
         case 6:
             deleteRescueTeam();
             break;
-        case 7:
+        case 7: 
             addReliefCamp();
             break;
         case 8:
@@ -886,9 +886,11 @@ private:
         case 10:
             searchReliefCamp();
             break;
+
         case 11:
             displayAllReliefCamps();
             break;
+
         case 12:
             isLoggedIn = 0;
             break;
@@ -1029,6 +1031,53 @@ private:
         else
         {
             cout << "No valid path to the nearest relief camp." << endl;
+        }
+    }
+
+void assignTeams()
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+
+        int disasterId;
+        cout << "Enter disaster ID to assign teams: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+
+        int teamId;
+        cout << "Enter team ID to assign: ";
+        cin >> teamId;
+        // Will change according to rescue team
+        if (rescueTeams.find(teamId) == rescueTeams.end())
+        {
+            cout << RED << "Invalid team ID." << RESET << endl;
+            return;
+        }
+
+        find->assignedTeams.push_back(teamId);
+        cout << GREEN << "Team assigned successfully!" << RESET << endl;
+    }
+
+
+    void viewHospitalsAndShelters()
+    {
+        cout << "\nHospitals and Shelters Overview:" << endl;
+        cout << "Hospitals:" << endl;
+        for (auto &city : cities)
+        {
+            for (auto &hospital : city.second.hospitals)
+            {
+                cout << "ID: " << hospital.id << ", Name: " << hospital.name
+                     << ", Location: " << hospital.location << ", Available Beds: " << hospital.availableBeds << endl;
+            }
         }
     }
 
