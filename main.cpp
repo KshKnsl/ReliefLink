@@ -1,21 +1,5 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <queue>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <iomanip>
-#include <ctime>
-#include <algorithm>
-#include <thread>
-#include <stack>
-#include <list>
-#include <set>
-#include <unordered_map>
-#include <climits>
-#include<cmath>
+#include <bits/stdc++.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -26,6 +10,42 @@ using namespace std;
 #define BLUE "\033[34m"
 #define MAGENTA "\033[35m"
 #define CYAN "\033[36m"
+void changeColor()
+{
+    cout << "\033[2J\033[1;1H";
+    const string colors[] = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", "10", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F", "20", "21", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F", "30", "31", "32", "34", "35", "36", "37", "38", "39", "3A", "3B", "3C", "3D", "3E", "3F", "40", "41", "42", "43", "45", "46", "47", "48", "49", "4A", "4B", "4C", "4D", "4E", "4F", "50", "51", "52", "53", "54", "56", "57", "58", "59", "5A", "5B", "5C", "5D", "5E", "5F", "60", "61", "62", "63", "64", "65", "67", "68", "69", "6A", "6B", "6C", "6D", "6E", "6F", "70", "71", "72", "73", "74", "75", "76", "78", "79", "7A", "7B", "7C", "7D", "7E", "7F", "80", "81", "82", "83", "84", "85", "86", "87", "89", "8A", "8B", "8C", "8D", "8E", "8F"};
+    srand((int)time(0));
+    int randomIndex = rand() % (sizeof(colors) / sizeof(colors[0]));
+    system(("color " + colors[randomIndex]).c_str());
+}
+void animatePrint(const string &filename)
+{
+    changeColor();
+    ifstream file(filename);
+    string line;
+    vector<string> lines;
+    while (getline(file, line))
+        lines.push_back(line);
+    size_t maxLength = 0;
+    for (const auto &l : lines)
+        maxLength = max(maxLength, l.length());
+    for (size_t i = 0; i < maxLength; ++i)
+    {
+        cout << "\033[2J\033[1;1H";
+        for (size_t j = 0; j < lines.size(); ++j)
+        {
+            if (i < lines[j].length())
+                cout << lines[j].substr(0, i + 1);
+            else
+                cout << lines[j].substr(0, lines[j].length());
+            cout << endl;
+        }
+        cout << endl;
+        nanosleep((const struct timespec[]){{0, 25000000L}}, nullptr);
+    }
+    sleep(1);
+    file.close();
+}
 
 struct Equipment
 {
@@ -62,8 +82,8 @@ struct City
     int emergencyVehicles;
 };
 
-
-class Location {
+class Location
+{
 private:
     double latitude;
     double longitude;
@@ -76,16 +96,18 @@ public:
     Location() : latitude(0.0), longitude(0.0), address(""), city(""), state("") {}
 
     // Parameterized Constructor
-    Location(double latitude, double longitude, const string& address, const string& city, const string& state)
+    Location(double latitude, double longitude, const string &address, const string &city, const string &state)
         : latitude(latitude), longitude(longitude), address(address), city(city), state(state) {}
 
     // Copy Constructor
-    Location(const Location& other)
+    Location(const Location &other)
         : latitude(other.latitude), longitude(other.longitude), address(other.address), city(other.city), state(other.state) {}
-    
+
     // Overloaded Assignment Operator
-    Location& operator=(const Location& other) {
-        if (this != &other) {
+    Location &operator=(const Location &other)
+    {
+        if (this != &other)
+        {
             latitude = other.latitude;
             longitude = other.longitude;
             address = other.address;
@@ -98,10 +120,16 @@ public:
     template <typename T>
     friend class BPlusTree;
     friend class DisasterManagementSystem;
-    friend ostream &operator<<(ostream &os, Location &loc);
+    friend ostream &operator<<(ostream &os, const Location &loc);
 };
+ostream &operator<<(ostream &os, const Location &loc)
+{
+    os << loc.address << ", " << loc.city << ", " << loc.state << " (" << loc.latitude << ", " << loc.longitude << ")";
+    return os;
+}
 
-class Disaster {
+class Disaster
+{
 private:
     int id;
     string type;
@@ -112,35 +140,50 @@ private:
     int affectedPopulation;
     vector<int> assignedTeams;
     vector<string> requiredResources;
-public:
 
+public:
     // Constructor for convenience
-    Disaster(int id, const string& type, const Location& location, int severity,
-             const string& status, const string& date, int affectedPopulation,
-             const vector<int>& assignedTeams, const vector<string>& requiredResources)
+    Disaster() {}
+    Disaster(int id, const string &type, const Location &location, int severity,
+             const string &status, const string &date, int affectedPopulation,
+             const vector<int> &assignedTeams, const vector<string> &requiredResources)
         : id(id), type(type), location(location), severity(severity),
           status(status), date(date), affectedPopulation(affectedPopulation),
           assignedTeams(assignedTeams), requiredResources(requiredResources) {}
 
     // Comparison operator for ordering (based on id as an example)
-    bool operator<(const Disaster& other) const {
+    bool operator<(const Disaster &other) const
+    {
         return id < other.id;
     }
 
-    bool operator==(const Disaster& other) const {
+    bool operator==(const Disaster &other) const
+    {
         return id == other.id;
     }
     template <typename T>
     friend class BPlusTree;
     friend class DisasterManagementSystem;
+    template <typename T>
+    friend class HashTable;
+    friend ostream &operator<<(ostream &os, const Disaster *D);
 };
-
-ostream &operator<<(ostream &os, Location &loc)
+ostream &operator<<(ostream &os, const Disaster *D)
 {
-    os << loc.address << ", " << loc.city << ", " << loc.state << " (" << loc.latitude << ", " << loc.longitude << ")";
+    os << "ID: " << D->id << endl;
+    os << "Type: " << D->type << endl;
+    os << "Status: " << D->status << endl;
+    os << "Severity: " << D->severity << endl;
+    os << "Date Of Disaster: " << D->date << endl;
+    os << "Affected Population: " << D->affectedPopulation << endl;
+    os << "Location: " << D->location << endl;
+    os << "Assigned Rescue Teams: ";
+    for (auto k : D->assignedTeams)
+    {
+        os << k << " ";
+    }
     return os;
 }
-
 struct RescueTeam
 {
     int id;
@@ -165,390 +208,518 @@ struct Shelter
     vector<string> facilities;
 };
 
+template <typename T>
+class HashTable
+{
+    vector<T *> V;
+    int size;
+    int total;
 
-template <typename T> class BPlusTree{
 public:
-    class Node {
+    HashTable(int s)
+    {
+        V.resize(s, NULL);
+        size = s;
+        total = 0;
+    }
+    int Hash(int k, int i = 0)
+    {
+        return (k + i) % size;
+    }
+    float Load()
+    {
+        return (1.0 * total) / size;
+    }
+    void Insert(T *D)
+    {
+        int pos = Hash(D->id);
+        int i = 1;
+        while (V[pos] != NULL)
+        {
+            pos = Hash(D->id, i);
+            i++;
+        }
+        V[pos] = D;
+        total++;
+        if (Load() > 0.7)
+        {
+            IncreaseSize(size * 2);
+        }
+    }
+    void IncreaseSize(int newSize)
+    {
+        vector<T *> oldTable = V;
+        size = newSize;
+        V.clear();
+        V.resize(size, nullptr);
+        total = 0;
+        for (T *d : oldTable)
+        {
+            if (d != nullptr)
+            {
+                Insert(d);
+            }
+        }
+    }
+
+    Disaster *Search(int k)
+    {
+        int pos = Hash(k);
+        int i = 1;
+        while (V[pos] != NULL)
+        {
+            if (V[pos]->id == k)
+                break;
+            pos = Hash(k, i);
+            i++;
+        }
+        return V[pos];
+    }
+
+    void Delete(int k)
+    {
+        int pos = Hash(k);
+        int i = 1;
+        while (V[pos] != NULL)
+        {
+            if (V[pos]->id == k)
+            {
+                V[pos] = NULL;
+                total--;
+                return;
+            }
+            pos = Hash(k, i);
+            i++;
+        }
+    }
+};
+
+template <typename T>
+class BPlusTree
+{
+public:
+    class Node
+    {
     private:
         bool isLeaf;
-        vector<T> keys;
-        vector<Node*> children;
-        Node* next;
+        vector<T *> keys;
+        vector<Node *> children;
+        Node *next;
 
     public:
         // Constructor
         Node(bool leaf = false) : isLeaf(leaf), next(nullptr) {}
         friend class BPlusTree<T>;
     };
-    
-    Node* root;
+
+    Node *root;
     int t;
-    void splitChild(Node* parent, int index, Node* child);
-    void insertNonFull(Node* node, T key);
-    void remove(Node* node, T key);
-    void borrowFromPrev(Node* node, int index);
-    void borrowFromNext(Node* node, int index);
-    void merge(Node* node, int index);
-    void printTree(Node* node, int level);
-    
-public:
-    BPlusTree(int degree): root(nullptr), t(degree){}
-    
-    void insert(T key);
-    bool search(T key);
-    void remove(T key);
-    void printTree();
-};
+    void splitChild(Node *parent, int index, Node *child)
+    {
+        Node *newChild = new Node(child->isLeaf);
+        parent->children.insert(parent->children.begin() + index + 1, newChild);
+        parent->keys.insert(parent->keys.begin() + index, child->keys[t - 1]);
 
-template <typename T>
-void BPlusTree<T>::splitChild(Node* parent, int index,Node* child){
-    Node* newChild = new Node(child->isLeaf);
-    parent->children.insert(parent->children.begin() + index + 1, newChild);
-    parent->keys.insert(parent->keys.begin() + index,child->keys[t - 1]);
-    
-    newChild->keys.assign(child->keys.begin() + t,child->keys.end());
-    child->keys.resize(t - 1);
-    
-    if (!child->isLeaf) {
-        newChild->children.assign(child->children.begin()+ t,child->children.end());
-        child->children.resize(t);
-    }
-    
-    if (child->isLeaf) {
-        newChild->next = child->next;
-        child->next = newChild;
-    }
-}
+        newChild->keys.assign(child->keys.begin() + t, child->keys.end());
+        child->keys.resize(t - 1);
 
-// Implementation of insertNonFull function
-template <typename T>
-void BPlusTree<T>::insertNonFull(Node* node, T key)
-{
-    if (node->isLeaf) {
-        node->keys.insert(upper_bound(node->keys.begin(),node->keys.end(),key),key);
-    }
-    else {
-        int i = node->keys.size() - 1;
-        while (i >= 0 && key < node->keys[i]) {
-            i--;
+        if (!child->isLeaf)
+        {
+            newChild->children.assign(child->children.begin() + t, child->children.end());
+            child->children.resize(t);
         }
-        i++;
-        if (node->children[i]->keys.size() == 2 * t - 1) {
-            splitChild(node, i, node->children[i]);
-            if (key > node->keys[i]) {
-                i++;
+
+        if (child->isLeaf)
+        {
+            newChild->next = child->next;
+            child->next = newChild;
+        }
+    }
+
+    // Implementation of insertNonFull function
+    void insertNonFull(Node *node, T *key)
+    {
+        if (node->isLeaf)
+        {
+            node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), key, [](const T *a, const T *b)
+                                          { return a->id < b->id; }),
+                              key);
+        }
+        else
+        {
+            int i = node->keys.size() - 1;
+            while (i >= 0 && key->id < node->keys[i]->id)
+            {
+                i--;
             }
-        }
-        insertNonFull(node->children[i], key);
-    }
-}
-
-// Implementation of remove function
-template <typename T>
-void BPlusTree<T>::remove(Node* node, T key)
-{
-    // If node is a leaf
-    if (node->isLeaf) {
-        auto it = find(node->keys.begin(), node->keys.end(),key);
-        if (it != node->keys.end()) {
-            node->keys.erase(it);
-        }
-    }
-    else {
-        int idx = lower_bound(node->keys.begin(),node->keys.end(), key)- node->keys.begin();
-        if (idx < node->keys.size()
-            && node->keys[idx] == key) {
-            if (node->children[idx]->keys.size() >= t) {
-                Node* predNode = node->children[idx];
-                while (!predNode->isLeaf) {
-                    predNode = predNode->children.back();
+            i++;
+            if ((int)node->children[i]->keys.size() == 2 * t - 1)
+            {
+                splitChild(node, i, node->children[i]);
+                if (key->id > node->keys[i]->id)
+                {
+                    i++;
                 }
-                T pred = predNode->keys.back();
-                node->keys[idx] = pred;
-                remove(node->children[idx], pred);
             }
-            else if (node->children[idx + 1]->keys.size()>= t) {
-                Node* succNode = node->children[idx + 1];
-                while (!succNode->isLeaf) {
-                    succNode = succNode->children.front();
+            insertNonFull(node->children[i], key);
+        }
+    }
+
+    // Implementation of remove function
+    void remove(Node *node, int key)
+    {
+        // If node is a leaf
+        if (node->isLeaf)
+        {
+            auto it = find(node->keys.begin(), node->keys.end(), key);
+            if (it != node->keys.end())
+            {
+                node->keys.erase(it);
+            }
+        }
+        else
+        {
+            int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
+            if (idx < node->keys.size() && node->keys[idx] == key)
+            {
+                if (node->children[idx]->keys.size() >= t)
+                {
+                    Node *predNode = node->children[idx];
+                    while (!predNode->isLeaf)
+                    {
+                        predNode = predNode->children.back();
+                    }
+                    T pred = predNode->keys.back();
+                    node->keys[idx] = pred;
+                    remove(node->children[idx], pred);
                 }
-                T succ = succNode->keys.front();
-                node->keys[idx] = succ;
-                remove(node->children[idx + 1], succ);
+                else if (node->children[idx + 1]->keys.size() >= t)
+                {
+                    Node *succNode = node->children[idx + 1];
+                    while (!succNode->isLeaf)
+                    {
+                        succNode = succNode->children.front();
+                    }
+                    T succ = succNode->keys.front();
+                    node->keys[idx] = succ;
+                    remove(node->children[idx + 1], succ);
+                }
+                else
+                {
+                    merge(node, idx);
+                    remove(node->children[idx], key);
+                }
             }
-            else {
-                merge(node, idx);
+            else
+            {
+                if (node->children[idx]->keys.size() < t)
+                {
+                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t)
+                    {
+                        borrowFromPrev(node, idx);
+                    }
+                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t)
+                    {
+                        borrowFromNext(node, idx);
+                    }
+                    else
+                    {
+                        if (idx < node->children.size() - 1)
+                        {
+                            merge(node, idx);
+                        }
+                        else
+                        {
+                            merge(node, idx - 1);
+                        }
+                    }
+                }
                 remove(node->children[idx], key);
             }
         }
-        else {
-            if (node->children[idx]->keys.size() < t) {
-                if (idx > 0&& node->children[idx - 1]->keys.size()>= t) {
-                    borrowFromPrev(node, idx);
-                }
-                else if (idx < node->children.size() - 1&& node->children[idx + 1]->keys.size()>= t) {
-                    borrowFromNext(node, idx);
-                }
-                else {
-                    if (idx < node->children.size() - 1) {
-                        merge(node, idx);
-                    }
-                    else {
-                        merge(node, idx - 1);
-                    }
+    }
+
+    // Implementation of borrowFromPrev function
+    void borrowFromPrev(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index - 1];
+
+        child->keys.insert(child->keys.begin(), node->keys[index - 1]);
+        node->keys[index - 1] = sibling->keys.back();
+        sibling->keys.pop_back();
+
+        if (!child->isLeaf)
+        {
+            child->children.insert(child->children.begin(), sibling->children.back());
+            sibling->children.pop_back();
+        }
+    }
+
+    // Implementation of borrowFromNext function
+    void borrowFromNext(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index + 1];
+
+        child->keys.push_back(node->keys[index]);
+        node->keys[index] = sibling->keys.front();
+        sibling->keys.erase(sibling->keys.begin());
+
+        if (!child->isLeaf)
+        {
+            child->children.push_back(sibling->children.front());
+            sibling->children.erase(sibling->children.begin());
+        }
+    }
+
+    // Implementation of merge function
+    void merge(Node *node, int index)
+    {
+        Node *child = node->children[index];
+        Node *sibling = node->children[index + 1];
+
+        child->keys.push_back(node->keys[index]);
+        child->keys.insert(child->keys.end(), sibling->keys.begin(), sibling->keys.end());
+        if (!child->isLeaf)
+        {
+            child->children.insert(child->children.end(), sibling->children.begin(), sibling->children.end());
+        }
+
+        node->keys.erase(node->keys.begin() + index);
+        node->children.erase(node->children.begin() + index + 1);
+
+        delete sibling;
+    }
+
+    // Implementation of printTree function
+    void printTree(Node *node, int level)
+    {
+        if (node != nullptr)
+        {
+            for (const T *key : node->keys)
+            {
+                cout << &*key << " ";
+            }
+            for (Node *child : node->children)
+            {
+                printTree(child, level + 1);
+            }
+        }
+    }
+    void AddDisasterToHash(HashTable<T> *H, Node *node, int level)
+    {
+        if (node != nullptr)
+        {
+            for (const T *key : node->keys)
+            {
+                if (key->status == "Active")
+                {
+                    H->Insert(key);
                 }
             }
-            remove(node->children[idx], key);
+            for (Node *child : node->children)
+            {
+                AddDisasterToHash(H, child, level + 1);
+            }
         }
     }
-}
 
-// Implementation of borrowFromPrev function
-template <typename T>
-void BPlusTree<T>::borrowFromPrev(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index - 1];
-    
-    child->keys.insert(child->keys.begin(),node->keys[index - 1]);
-    node->keys[index - 1] = sibling->keys.back();
-    sibling->keys.pop_back();
-    
-    if (!child->isLeaf) {
-        child->children.insert(child->children.begin(),sibling->children.back());
-        sibling->children.pop_back();
-    }
-}
-
-// Implementation of borrowFromNext function
-template <typename T>
-void BPlusTree<T>::borrowFromNext(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index + 1];
-    
-    child->keys.push_back(node->keys[index]);
-    node->keys[index] = sibling->keys.front();
-    sibling->keys.erase(sibling->keys.begin());
-    
-    if (!child->isLeaf) {
-        child->children.push_back(sibling->children.front());
-        sibling->children.erase(sibling->children.begin());
-    }
-}
-
-// Implementation of merge function
-template <typename T>
-void BPlusTree<T>::merge(Node* node, int index)
-{
-    Node* child = node->children[index];
-    Node* sibling = node->children[index + 1];
-    
-    child->keys.push_back(node->keys[index]);
-    child->keys.insert(child->keys.end(),sibling->keys.begin(),sibling->keys.end());
-    if (!child->isLeaf) {
-        child->children.insert(child->children.end(),sibling->children.begin(),sibling->children.end());
-    }
-    
-    node->keys.erase(node->keys.begin() + index);
-    node->children.erase(node->children.begin() + index+ 1);
-    
-    delete sibling;
-}
-
-// Implementation of printTree function
-template <typename T>
-void BPlusTree<T>::printTree(Node* node, int level)
-{
-    if (node != nullptr) {
-        for (const T& key : node->keys) {
-            cout << key << " ";
-        }
-        for (Node* child : node->children) {
-            printTree(child, level + 1);
-        }
-    }
-}
-
-// Implementation of printTree wrapper function
-template <typename T> void BPlusTree<T>::printTree()
-{
-    printTree(root, 0);
-}
-
-// Implementation of search function
-template <typename T> bool BPlusTree<T>::search(T key)
-{
-    Node* current = root;
-    while (current != nullptr) {
-        int i = 0;
-        while (i < current->keys.size()&& key > current->keys[i]) {
-            i++;
-        }
-        if (i < current->keys.size()&& key == current->keys[i]) {
-            return true;
-        }
-        if (current->isLeaf) {
-            return false;
-        }
-        current = current->children[i];
-    }
-    return false;
-}
-
-// Implementation of insert function
-template <typename T> void BPlusTree<T>::insert(T key)
-{
-    if (root == nullptr) {
-        root = new Node(true);
-        root->keys.push_back(key);
-    }
-    else {
-        if (root->keys.size() == 2 * t - 1) {
-            Node* newRoot = new Node();
-            newRoot->children.push_back(root);
-            splitChild(newRoot, 0, root);
-            root = newRoot;
-        }
-        insertNonFull(root, key);
-    }
-}
-
-// Implementation of remove function
-template <typename T> void BPlusTree<T>::remove(T key)
-{
-    if (root == nullptr) {
-        return;
-    }
-    remove(root, key);
-    if (root->keys.empty() && !root->isLeaf) {
-        Node* tmp = root;
-        root = root->children[0];
-        delete tmp;
-    }
-}
-
-
-class Graph {
-private:
-    unordered_map<string, vector<pair<string, int>>> adj; // Node -> [(Neighbor, Weight)]
 public:
-    void addNode(const string& node) {
-        if (adj.find(node) == adj.end()) adj[node] = {};
+    BPlusTree(int degree) : root(nullptr), t(degree) {}
+    // Implementation of printTree wrapper function
+    void printTree()
+    {
+        printTree(root, 0);
     }
 
-    void addEdge(const string& from, const string& to, int weight) {
-        adj[from].push_back({to, weight});
-        adj[to].push_back({from, weight}); // For undirected graph
-    }
-
-    // Shortest Path: Basic Dijkstra
-    vector<string> dijkstra(const string& start, const string& end) {
-        unordered_map<string, int> dist;
-        unordered_map<string, string> parent;
-        for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
-        dist[start] = 0;
-
-        priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
-        pq.push({0, start});
-
-        while (!pq.empty()) {
-            auto [d, current] = pq.top();
-            pq.pop();
-            if (current == end) break;
-
-            for (auto& [neighbor, weight] : adj[current]) {
-                if (dist[current] + weight < dist[neighbor]) {
-                    dist[neighbor] = dist[current] + weight;
-                    pq.push({dist[neighbor], neighbor});
-                    parent[neighbor] = current;
-                }
+    // Implementation of search function
+    T *search(int key)
+    {
+        Node *current = root;
+        while (current != nullptr)
+        {
+            int i = 0;
+            while (i < current->keys.size() && key > current->keys[i]->id)
+            {
+                i++;
             }
+            if (i < current->keys.size() && key == current->keys[i]->id)
+            {
+                return current->keys[i];
+            }
+            if (current->isLeaf)
+            {
+                return NULL;
+            }
+            current = current->children[i];
         }
-
-        vector<string> path;
-        for (string at = end; at != start; at = parent[at]) {
-            path.push_back(at);
-            if (parent.find(at) == parent.end()) return {}; // No path found
-        }
-        path.push_back(start);
-        reverse(path.begin(), path.end());
-        return path;
+        return NULL;
     }
 
-    // Optimal Path: Considering route easibility
-    vector<string> optimalPath(const string& start, const string& end, int maxWeight) {
-        unordered_map<string, int> dist;
-        unordered_map<string, string> parent;
-        for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
-        dist[start] = 0;
-
-        priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
-        pq.push({0, start});
-
-        while (!pq.empty()) {
-            auto [d, current] = pq.top();
-            pq.pop();
-            if (current == end) break;
-
-            for (auto& [neighbor, weight] : adj[current]) {
-                if (weight > maxWeight) continue; // Skip edges that don't satisfy easibility
-                if (dist[current] + weight < dist[neighbor]) {
-                    dist[neighbor] = dist[current] + weight;
-                    pq.push({dist[neighbor], neighbor});
-                    parent[neighbor] = current;
-                }
+    // Implementation of insert function
+    void insert(T *key)
+    {
+        if (root == nullptr)
+        {
+            root = new Node(true);
+            root->keys.push_back(key);
+        }
+        else
+        {
+            if ((int)root->keys.size() == 2 * t - 1)
+            {
+                Node *newRoot = new Node();
+                newRoot->children.push_back(root);
+                splitChild(newRoot, 0, root);
+                root = newRoot;
             }
+            insertNonFull(root, key);
         }
+    }
 
-        vector<string> path;
-        for (string at = end; at != start; at = parent[at]) {
-            path.push_back(at);
-            if (parent.find(at) == parent.end()) return {}; // No path found
+    // Implementation of remove function
+    void remove(int key)
+    {
+        if (root == nullptr)
+        {
+            return;
         }
-        path.push_back(start);
-        reverse(path.begin(), path.end());
-        return path;
+        remove(root, key);
+        if (root->keys.empty() && !root->isLeaf)
+        {
+            Node *tmp = root;
+            root = root->children[0];
+            delete tmp;
+        }
+    }
+
+    void AddActiveDisaster(HashTable<T> *H)
+    {
+        AddDisasterToHash(H, root, 0);
     }
 };
 
-class RoutingSystem {
-private:
-    Graph graph;
-public:
-    void updateGraph(const string& from, const string& to, int weight) {
-        graph.addNode(from);
-        graph.addNode(to);
-        graph.addEdge(from, to, weight);
-    }
+// class Graph {
+// private:
+//     unordered_map<string, vector<pair<string, int>>> adj; // Node -> [(Neighbor, Weight)]
+// public:
+//     void addNode(const string& node) {
+//         if (adj.find(node) == adj.end()) adj[node] = {};
+//     }
 
-    void shortestPath(const string& start, const string& end) {
-        vector<string> path = graph.dijkstra(start, end);
-        if (path.empty()) {
-            cout << "No path found between " << start << " and " << end << endl;
-        } else {
-            cout << "Shortest path from " << start << " to " << end << ": ";
-            for (const string& node : path) cout << node << " ";
-            cout << endl;
-        }
-    }
+//     void addEdge(const string& from, const string& to, int weight) {
+//         adj[from].push_back({to, weight});
+//         adj[to].push_back({from, weight}); // For undirected graph
+//     }
 
-    void calculateOptimalPath(const string& start, const string& end, int maxWeight) {
-        vector<string> path = graph.optimalPath(start, end, maxWeight);
-        if (path.empty()) {
-            cout << "No optimal path found between " << start << " and " << end << " under max weight " << maxWeight << endl;
-        } else {
-            cout << "Optimal path (max weight " << maxWeight << ") from " << start << " to " << end << ": ";
-            for (const string& node : path) cout << node << " ";
-            cout << endl;
-        }
-    }
-};
+//     // Shortest Path: Basic Dijkstra
+//     vector<string> dijkstra(const string& start, const string& end) {
+//         unordered_map<string, int> dist;
+//         unordered_map<string, string> parent;
+//         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
+//         dist[start] = 0;
+
+//         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
+//         pq.push({0, start});
+
+//         while (!pq.empty()) {
+//             auto [d, current] = pq.top();
+//             pq.pop();
+//             if (current == end) break;
+
+//             for (auto& [neighbor, weight] : adj[current]) {
+//                 if (dist[current] + weight < dist[neighbor]) {
+//                     dist[neighbor] = dist[current] + weight;
+//                     pq.push({dist[neighbor], neighbor});
+//                     parent[neighbor] = current;
+//                 }
+//             }
+//         }
+
+//         vector<string> path;
+//         for (string at = end; at != start; at = parent[at]) {
+//             path.push_back(at);
+//             if (parent.find(at) == parent.end()) return {}; // No path found
+//         }
+//         path.push_back(start);
+//         reverse(path.begin(), path.end());
+//         return path;
+//     }
+
+//     // Optimal Path: Considering route easibility
+//     vector<string> optimalPath(const string& start, const string& end, int maxWeight) {
+//         unordered_map<string, int> dist;
+//         unordered_map<string, string> parent;
+//         for (auto& [node, _] : adj) dist[node] = numeric_limits<int>::max();
+//         dist[start] = 0;
+
+//         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;
+//         pq.push({0, start});
+
+//         while (!pq.empty()) {
+//             auto [d, current] = pq.top();
+//             pq.pop();
+//             if (current == end) break;
+
+//             for (auto& [neighbor, weight] : adj[current]) {
+//                 if (weight > maxWeight) continue; // Skip edges that don't satisfy easibility
+//                 if (dist[current] + weight < dist[neighbor]) {
+//                     dist[neighbor] = dist[current] + weight;
+//                     pq.push({dist[neighbor], neighbor});
+//                     parent[neighbor] = current;
+//                 }
+//             }
+//         }
+
+//         vector<string> path;
+//         for (string at = end; at != start; at = parent[at]) {
+//             path.push_back(at);
+//             if (parent.find(at) == parent.end()) return {}; // No path found
+//         }
+//         path.push_back(start);
+//         reverse(path.begin(), path.end());
+//         return path;
+//     }
+// };
+
+// class RoutingSystem {
+// private:
+//     Graph graph;
+// public:
+//     void updateGraph(const string& from, const string& to, int weight) {
+//         graph.addNode(from);
+//         graph.addNode(to);
+//         graph.addEdge(from, to, weight);
+//     }
+
+//     void shortestPath(const string& start, const string& end) {
+//         vector<string> path = graph.dijkstra(start, end);
+//         if (path.empty()) {
+//             cout << "No path found between " << start << " and " << end << endl;
+//         } else {
+//             cout << "Shortest path from " << start << " to " << end << ": ";
+//             for (const string& node : path) cout << node << " ";
+//             cout << endl;
+//         }
+//     }
+
+//     void calculateOptimalPath(const string& start, const string& end, int maxWeight) {
+//         vector<string> path = graph.optimalPath(start, end, maxWeight);
+//         if (path.empty()) {
+//             cout << "No optimal path found between " << start << " and " << end << " under max weight " << maxWeight << endl;
+//         } else {
+//             cout << "Optimal path (max weight " << maxWeight << ") from " << start << " to " << end << ": ";
+//             for (const string& node : path) cout << node << " ";
+//             cout << endl;
+//         }
+//     }
+// };
 
 class DisasterManagementSystem
 {
 private:
-    map<int, Disaster> disasters;
+    BPlusTree<Disaster> *disasters;
     map<int, RescueTeam> rescueTeams;
     map<int, Shelter> shelters;
     map<string, City> cities;
@@ -560,144 +731,45 @@ private:
     int currentShelterId;
     int currentEquipmentId;
 
-    bool isLoggedIn;
+    int isLoggedIn; // 0: Not logged in, 1: Admin, 2: Rescue Team
     string currentUser;
     map<string, string> users;
-
-    void loadAllData()
-    {
-        loadUsers();
-        loadCities();
-        loadEquipment();
-    }
-
-    void saveAllData()
-    {
-        saveUsers();
-        saveCities();
-        saveEquipment();
-    }
+    map<string, string> RescueUsers;
 
     void loadUsers()
     {
         ifstream file("users.txt");
-        string line;
-        while (getline(file, line))
+        string username, password;
+        while (getline(file, username))
         {
-            stringstream ss(line);
-            string username, password;
-            getline(ss, username, '|');
-            getline(ss, password);
+            getline(file, password);
             users[username] = password;
         }
         file.close();
     }
-
-    void saveUsers()
+    void loadRescueUsers()
     {
-        ofstream file("users.txt");
-        for (auto &user : users)
+        ifstream file("rescueUsers.txt");
+        string username, password;
+        while (getline(file, username))
         {
-            file << user.first << "|" << user.second << "\n";
+            getline(file, password);
+            RescueUsers[username] = password;
         }
         file.close();
     }
-
-    void loadCities()
-    {
-        ifstream file("cities.txt");
-        string line;
-        while (getline(file, line))
-        {
-            stringstream ss(line);
-            City city;
-            string temp;
-
-            getline(ss, city.name, '|');
-            getline(ss, city.state, '|');
-            getline(ss, temp, '|');
-            city.latitude = stod(temp);
-            getline(ss, temp, '|');
-            city.longitude = stod(temp);
-            getline(ss, temp, '|');
-            city.population = stoi(temp);
-            getline(ss, temp, '|');
-            city.fireStations = stoi(temp);
-            getline(ss, temp, '|');
-            city.policeStations = stoi(temp);
-            getline(ss, temp, '|');
-            city.emergencyVehicles = stoi(temp);
-
-            cities[city.name] = city;
-        }
-        file.close();
-    }
-
-    void saveCities()
-    {
-        ofstream file("cities.txt");
-        for (auto &city : cities)
-        {
-            auto &c = city.second;
-            file << c.name << "|" << c.state << "|"
-                 << fixed << setprecision(6) << c.latitude << "|"
-                 << fixed << setprecision(6) << c.longitude << "|"
-                 << c.population << "|"
-                 << c.fireStations << "|"
-                 << c.policeStations << "|"
-                 << c.emergencyVehicles << "\n";
-        }
-        file.close();
-    }
-
-    void loadEquipment()
-    {
-        ifstream file("equipment.txt");
-        string line;
-        while (getline(file, line))
-        {
-            stringstream ss(line);
-            Equipment eq;
-            string temp;
-
-            getline(ss, temp, '|');
-            eq.id = stoi(temp);
-            getline(ss, eq.name, '|');
-            getline(ss, eq.type, '|');
-            getline(ss, temp, '|');
-            eq.isAvailable = (temp == "1");
-            getline(ss, eq.currentLocation, '|');
-            getline(ss, temp, '|');
-            eq.condition = stoi(temp);
-
-            equipment[eq.id] = eq;
-        }
-        file.close();
-    }
-
-    void saveEquipment()
-    {
-        ofstream file("equipment.txt");
-        for (auto &eq : equipment)
-        {
-            file << eq.second.id << "|" << eq.second.name << "|" << eq.second.type << "|"
-                 << (eq.second.isAvailable ? 1 : 0) << "|"
-                 << eq.second.currentLocation << "|" << eq.second.condition << "\n";
-        }
-        file.close();
-    }
-
     void showMenu()
     {
-        cout << "\nWelcome to Disaster Management System!" << endl;
+        cout << "\nWelcome to Relief Link! How can we help you?" << endl;
         cout << "1. Login as Admin" << endl;
-        cout << "2. Report Disaster" << endl;
-        cout << "3. Request Help (Citizen)" << endl;
-        cout << "4. Exit" << endl;
+        cout << "2. Login as Rescue Team" << endl;
+        cout << "3. Report Disaster" << endl;
+        cout << "4. Request Help (Citizen)" << endl;
+        cout << "5. Exit" << endl;
     }
-
     void adminMenu()
     {
+        changeColor();
         while (true)
         {
             cout << "\nAdmin Menu:" << endl;
@@ -706,7 +778,7 @@ private:
             cout << "3. View and Assign Teams to Disasters" << endl;
             cout << "4. View and Assign Equipment to Teams" << endl;
             cout << "5. View Hospitals and Shelters" << endl;
-            cout << "6. Logout" << endl;
+            cout << "6. Logout OR Exit" << endl;
             int choice;
             cin >> choice;
 
@@ -724,7 +796,7 @@ private:
             }
             else if (choice == 4)
             {
-                assignEquipment();
+                
             }
             else if (choice == 5)
             {
@@ -732,8 +804,11 @@ private:
             }
             else if (choice == 6)
             {
-                isLoggedIn = false;
+                isLoggedIn = 0;
+                currentUser = "";
                 cout << GREEN << "Logged out successfully!" << RESET << endl;
+                sleep(2);
+                changeColor();
                 break;
             }
             else
@@ -748,6 +823,7 @@ private:
         string disasterType, status, date;
         double latitude, longitude;
         int severity, affectedPopulation;
+        string address, city, state;
 
         cout << "Enter disaster type: ";
         cin >> disasterType;
@@ -757,37 +833,112 @@ private:
         cin >> date;
         cout << "Enter latitude and longitude of disaster: ";
         cin >> latitude >> longitude;
+        cout << "Enter Address: ";
+        cin >> address;
+        cout << "Enter City: ";
+        cin >> city;
+        cout << "Enter State: ";
+        cin >> state;
         cout << "Enter severity (1 to 5): ";
         cin >> severity;
         cout << "Enter affected population: ";
         cin >> affectedPopulation;
 
-        Location loc = {latitude, longitude, "", "", ""};
-        Disaster disaster = {currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {}};
-        disasters[disaster.id] = disaster;
+        Location loc(latitude, longitude, address, city, state);
+        Disaster *D = new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
+        disasters->insert(D);
         cout << GREEN << "Disaster reported successfully!" << RESET << endl;
     }
 
     void viewAllDisasters()
     {
-        if (disasters.empty())
+        cout << "Disasters Reported:" << endl;
+        disasters->printTree();
+    }
+
+    void UpdateStatus()
+    {
+        if (disasters == NULL)
         {
-            cout << RED << "No disasters reported yet." << RESET << endl;
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
         }
 
-        cout << "Disasters Reported:" << endl;
-        for (auto &disaster : disasters)
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
-            cout << "ID: " << disaster.second.id << ", Type: " << disaster.second.type
-                 << ", Status: " << disaster.second.status << ", Severity: " << disaster.second.severity
-                 << ", Affected Population: " << disaster.second.affectedPopulation << endl;
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
         }
+
+        string status;
+        cout << "Enter Updated Status: ";
+        cin >> status;
+        find->status = status;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
+    }
+
+    void UpdateSeverity()
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+
+        int severity;
+        cout << "Enter Updated Severity: ";
+        cin >> severity;
+        find->severity = severity;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
+    }
+
+    void UpdateLocation(int Did, Location L)
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+        int disasterId;
+        cout << "Enter Disaster ID to Update Severity: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+        double latitude, longitude;
+        string address, city, state;
+        cout << "Enter latitude and longitude of disaster: ";
+        cin >> latitude >> longitude;
+        cout << "Enter Address: ";
+        cin >> address;
+        cout << "Enter City: ";
+        cin >> city;
+        cout << "Enter State: ";
+        cin >> state;
+        Location loc(latitude, longitude, address, city, state);
+        find->location = loc;
+        cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
 
     void assignTeams()
     {
-        if (disasters.empty())
+        if (disasters == NULL)
         {
             cout << RED << "No disasters to assign teams to." << RESET << endl;
             return;
@@ -796,8 +947,8 @@ private:
         int disasterId;
         cout << "Enter disaster ID to assign teams: ";
         cin >> disasterId;
-
-        if (disasters.find(disasterId) == disasters.end())
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
         {
             cout << RED << "Invalid disaster ID." << RESET << endl;
             return;
@@ -806,48 +957,48 @@ private:
         int teamId;
         cout << "Enter team ID to assign: ";
         cin >> teamId;
-
+        // Will change according to rescue team
         if (rescueTeams.find(teamId) == rescueTeams.end())
         {
             cout << RED << "Invalid team ID." << RESET << endl;
             return;
         }
 
-        disasters[disasterId].assignedTeams.push_back(teamId);
+        find->assignedTeams.push_back(teamId);
         cout << GREEN << "Team assigned successfully!" << RESET << endl;
     }
 
-    void assignEquipment()
-    {
-        if (disasters.empty())
-        {
-            cout << RED << "No disasters to assign equipment to." << RESET << endl;
-            return;
-        }
-
-        int disasterId;
-        cout << "Enter disaster ID to assign equipment: ";
-        cin >> disasterId;
-
-        if (disasters.find(disasterId) == disasters.end())
-        {
-            cout << RED << "Invalid disaster ID." << RESET << endl;
-            return;
-        }
-
-        int equipmentId;
-        cout << "Enter equipment ID to assign: ";
-        cin >> equipmentId;
-
-        if (equipment.find(equipmentId) == equipment.end())
-        {
-            cout << RED << "Invalid equipment ID." << RESET << endl;
-            return;
-        }
-
-        disasters[disasterId].requiredResources.push_back(equipment[equipmentId].name);
-        cout << GREEN << "Equipment assigned successfully!" << RESET << endl;
-    }
+    //    void assignEquipment()
+    //    {
+    //        if (disasters.empty())
+    //        {
+    //            cout << RED << "No disasters to assign equipment to." << RESET << endl;
+    //            return;
+    //        }
+    //
+    //        int disasterId;
+    //        cout << "Enter disaster ID to assign equipment: ";
+    //        cin >> disasterId;
+    //
+    //        if (disasters.find(disasterId) == disasters.end())
+    //        {
+    //            cout << RED << "Invalid disaster ID." << RESET << endl;
+    //            return;
+    //        }
+    //
+    //        int equipmentId;
+    //        cout << "Enter equipment ID to assign: ";
+    //        cin >> equipmentId;
+    //
+    //        if (equipment.find(equipmentId) == equipment.end())
+    //        {
+    //            cout << RED << "Invalid equipment ID." << RESET << endl;
+    //            return;
+    //        }
+    //
+    //        disasters[disasterId].requiredResources.push_back(equipment[equipmentId].name);
+    //        cout << GREEN << "Equipment assigned successfully!" << RESET << endl;
+    //    }
 
     void viewHospitalsAndShelters()
     {
@@ -870,32 +1021,28 @@ private:
         }
     }
 
-    void citizenRequest()
-    {
-        int disasterId;
-        cout << "Enter disaster ID to request help: ";
-        cin >> disasterId;
-
-        if (disasters.find(disasterId) == disasters.end())
-        {
-            cout << RED << "Invalid disaster ID." << RESET << endl;
-            return;
-        }
-
-        cout << GREEN << "Request submitted successfully! Help is on the way!" << RESET << endl;
-    }
+    //    void citizenRequest()
+    //    {
+    //        int disasterId;
+    //        cout << "Enter disaster ID to request help: ";
+    //        cin >> disasterId;
+    //
+    //        if (disasters.find(disasterId) == disasters.end())
+    //        {
+    //            cout << RED << "Invalid disaster ID." << RESET << endl;
+    //            return;
+    //        }
+    //
+    //        cout << GREEN << "Request submitted successfully! Help is on the way!" << RESET << endl;
+    //    }
 
 public:
     DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
-        loadAllData();
+        disasters = new BPlusTree<Disaster>(5);
+        loadUsers();
+        loadRescueUsers();
     }
-
-    ~DisasterManagementSystem()
-    {
-        saveAllData();
-    }
-
     void run()
     {
         while (true)
@@ -915,9 +1062,10 @@ public:
 
                 if (users.find(username) != users.end() && users[username] == password)
                 {
-                    isLoggedIn = true;
+                    isLoggedIn = 1;
                     currentUser = username;
                     cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
                     adminMenu();
                 }
                 else
@@ -927,6 +1075,27 @@ public:
             }
             else if (choice == 2)
             {
+                // Rescue Team login
+                string username, password;
+                cout << "Enter username: ";
+                cin >> username;
+                cout << "Enter password: ";
+                cin >> password;
+
+                if (RescueUsers.find(username) != RescueUsers.end() && RescueUsers[username] == password)
+                {
+                    isLoggedIn = 2;
+                    currentUser = username;
+                    cout << GREEN << "Login successful!" << RESET << endl;
+                    sleep(2);
+                }
+                else
+                {
+                    cout << RED << "Invalid credentials. Try again." << RESET << endl;
+                }
+            }
+            else if (choice == 3)
+            {
                 // Report Disaster (for admin)
                 if (!isLoggedIn)
                 {
@@ -935,14 +1104,14 @@ public:
                 }
                 reportDisaster();
             }
-            else if (choice == 3)
-            {
-                // Citizen Request (no login required)
-                citizenRequest();
-            }
             else if (choice == 4)
             {
-                break;
+                // Citizen Request (no login required)
+                //                citizenRequest();
+            }
+            else if (choice == 5)
+            {
+                return;
             }
             else
             {
@@ -952,103 +1121,117 @@ public:
     }
 };
 
-class Alert {
-private:    
-    int AlertID;    
-    int DisasterID;    
-    int Severity;    
-    string Message;    
+class Alert
+{
+private:
+    int AlertID;
+    int DisasterID;
+    int Severity;
+    string Message;
     string Time;
-public:    
-    Alert(int alertID, int disasterID, int severity, string message, string time) {        
-        AlertID = alertID;        
-        DisasterID = disasterID;        
-        Severity = severity;        
-        Message = message;        
-        Time = time;    
+
+public:
+    Alert(int alertID, int disasterID, int severity, string message, string time)
+    {
+        AlertID = alertID;
+        DisasterID = disasterID;
+        Severity = severity;
+        Message = message;
+        Time = time;
     }
-    
-    int getSeverity() const { return Severity; }    
-    string getMessage() const { return Message; }    
-    string getTime() const { return Time; }    
+
+    int getSeverity() const { return Severity; }
+    string getMessage() const { return Message; }
+    string getTime() const { return Time; }
     int getAlertID() const { return AlertID; }
-    
-    friend ostream &operator<<(ostream &os, const Alert &alert) {        
-        os << "AlertID: " << alert.AlertID            
-           << ", DisasterID: " << alert.DisasterID            
-           << ", Severity: " << alert.Severity            
-           << ", Message: " << alert.Message            
-           << ", Time: " << alert.Time;        
-        return os;    
+
+    friend ostream &operator<<(ostream &os, const Alert &alert)
+    {
+        os << "AlertID: " << alert.AlertID
+           << ", DisasterID: " << alert.DisasterID
+           << ", Severity: " << alert.Severity
+           << ", Message: " << alert.Message
+           << ", Time: " << alert.Time;
+        return os;
     }
 };
 
-class MaxHeap {
-private:    
+class MaxHeap
+{
+private:
     vector<Alert> heap;
-    
-    int parent(int index) { return (index - 1) / 2; }    
-    int leftChild(int index) { return 2 * index + 1; }    
+
+    int parent(int index) { return (index - 1) / 2; }
+    int leftChild(int index) { return 2 * index + 1; }
     int rightChild(int index) { return 2 * index + 2; }
-    
-    void heapifyUp(int index) {        
-        while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity()) {            
-            swap(heap[index], heap[parent(index)]);            
-            index = parent(index);        
-        }    
+
+    void heapifyUp(int index)
+    {
+        while (index != 0 && heap[parent(index)].getSeverity() < heap[index].getSeverity())
+        {
+            swap(heap[index], heap[parent(index)]);
+            index = parent(index);
+        }
     }
-    
-    void heapifyDown(int index) {        
-        int largest = index;        
-        int left = leftChild(index);        
+
+    void heapifyDown(int index)
+    {
+        int largest = index;
+        int left = leftChild(index);
         int right = rightChild(index);
-        
-        if (left < heap.size() && heap[left].getSeverity() > heap[largest].getSeverity())            
+
+        if (left < heap.size() && heap[left].getSeverity() > heap[largest].getSeverity())
             largest = left;
-        
-        if (right < heap.size() && heap[right].getSeverity() > heap[largest].getSeverity())            
+
+        if (right < heap.size() && heap[right].getSeverity() > heap[largest].getSeverity())
             largest = right;
-        
-        if (largest != index) {            
-            swap(heap[index], heap[largest]);            
-            heapifyDown(largest);        
-        }    
+
+        if (largest != index)
+        {
+            swap(heap[index], heap[largest]);
+            heapifyDown(largest);
+        }
     }
-public:    
-    void insert(const Alert &alert) {        
-        heap.push_back(alert);        
-        heapifyUp(heap.size() - 1);    
+
+public:
+    void insert(const Alert &alert)
+    {
+        heap.push_back(alert);
+        heapifyUp((int)heap.size() - 1);
     }
-    
-    Alert extractMax() {        
-        if (heap.empty())            
+
+    Alert extractMax()
+    {
+        if (heap.empty())
             throw runtime_error("Heap is empty!");
-        
-        Alert maxAlert = heap[0];        
-        heap[0] = heap.back();        
-        heap.pop_back();        
-        heapifyDown(0);        
-        return maxAlert;    
+
+        Alert maxAlert = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapifyDown(0);
+        return maxAlert;
     }
-    
-    Alert getMax() const {        
-        if (heap.empty())            
-            throw runtime_error("Heap is empty!");        
-        return heap[0];    
+
+    Alert getMax() const
+    {
+        if (heap.empty())
+            throw runtime_error("Heap is empty!");
+        return heap[0];
     }
-    
-    bool isEmpty() const {        
-        return heap.empty();    
+
+    bool isEmpty() const
+    {
+        return heap.empty();
     }
-    
-    void displayHeap() const {        
-        for (const Alert &alert : heap) {            
-            cout << alert << endl;        
-        }    
+
+    void displayHeap() const
+    {
+        for (const Alert &alert : heap)
+        {
+            cout << alert << endl;
+        }
     }
 };
-
-
 
 class TrieNode
 {
@@ -1074,6 +1257,7 @@ private:
             prefix.pop_back();
         }
     }
+
 public:
     Trie() : root(new TrieNode()) {}
     void insert(string word)
@@ -1111,7 +1295,7 @@ public:
     void insertBulk(string data)
     {
         int start = 0, end = 0;
-        while ((end = data.find(',', start)) != string::npos)
+        while ((end = (int)data.find(',', start)) != string::npos)
         {
             insert(data.substr(start, end - start));
             start = end + 1;
@@ -1210,6 +1394,25 @@ private:
 
         return searchRec(node->right, name);
     }
+    KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
+        if (!node) return nullptr;
+
+        unsigned cd = depth % 2;
+        if (cd == d) {
+            if (!node->left) return node;
+            return findMin(node->left, d, depth + 1);
+        }
+
+        KDNode* leftMin = findMin(node->left, d, depth + 1);
+        KDNode* rightMin = findMin(node->right, d, depth + 1);
+
+        KDNode* minNode = node;
+        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude) minNode = leftMin;
+        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude) minNode = rightMin;
+
+        return minNode;
+    }
+
 
     KDNode* deleteRec(KDNode* node, const string& name, unsigned depth) {
         if (!node) return nullptr;
@@ -1231,25 +1434,7 @@ private:
         return node;
     }
 
-    KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
-        if (!node) return nullptr;
-
-        unsigned cd = depth % 2;
-        if (cd == d) {
-            if (!node->left) return node;
-            return findMin(node->left, d, depth + 1);
-        }
-
-        KDNode* leftMin = findMin(node->left, d, depth + 1);
-        KDNode* rightMin = findMin(node->right, d, depth + 1);
-
-        KDNode* minNode = node;
-        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude) minNode = leftMin;
-        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude) minNode = rightMin;
-
-        return minNode;
-    }
-
+  
     void displaySheltersRec(KDNode* node) {
         if (!node) return;
 
@@ -1306,44 +1491,44 @@ public:
 };
 
 
+       
+
 int main()
 {
-    Trie trie;
-    trie.insertBulk("New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose");
-    cout << "Search 'Chicago': " << (trie.search("Chicago") ? "Found" : "Not Found") << endl;
-    cout << "Search 'Miami': " << (trie.search("Miami") ? "Found" : "Not Found") << endl;
-    cout << "Starts with 'San': " << (trie.startsWith("San") ? "Yes" : "No") << endl;
-    cout << "Starts with 'Bos': " << (trie.startsWith("Bos") ? "Yes" : "No") << endl;
-    cout << "Autocomplete 'San':" << endl;
-    vector<string> results = trie.autocomplete("San");
-    for (string &result : results)
-    {
-        cout << "  " << result << endl;
-    }
+    //     Trie trie;
+    //     trie.insertBulk("New York,Los Angeles,Chicago,Houston,Phoenix,Philadelphia,San Antonio,San Diego,Dallas,San Jose");
+    //     cout << "Search 'Chicago': " << (trie.search("Chicago") ? "Found" : "Not Found") << endl;
+    //     cout << "Search 'Miami': " << (trie.search("Miami") ? "Found" : "Not Found") << endl;
+    //     cout << "Starts with 'San': " << (trie.startsWith("San") ? "Yes" : "No") << endl;
+    //     cout << "Starts with 'Bos': " << (trie.startsWith("Bos") ? "Yes" : "No") << endl;
+    //     cout << "Autocomplete 'San':" << endl;
+    //     vector<string> results = trie.autocomplete("San");
+    //     for (string &result : results)
+    //     {
+    //         cout << "  " << result << endl;
+    //     }
 
+    // MaxHeap alertHeap;
+
+    // alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));
+    // alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));
+    // alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));
+    // alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
+
+    // cout << "Alerts in Max-Heap:" << endl;
+    // alertHeap.displayHeap();
+    // cout << endl;
+
+    // cout << "Processing Alerts by Priority:" << endl;
+    // while (!alertHeap.isEmpty())
+    // {
+    //     Alert alert = alertHeap.extractMax();
+    //     cout << "Processing: " << alert << endl;
+    // }
+    animatePrint("Logo.txt");
+    animatePrint("Welcome.txt");
     DisasterManagementSystem dms;
     dms.run();
-
-
-    MaxHeap alertHeap;
-    
-    alertHeap.insert(Alert(1, 101, 5, "chicago", "2024-11-16 10:00"));    
-    alertHeap.insert(Alert(2, 102, 8, "Miami", "2024-11-16 10:30"));    
-    alertHeap.insert(Alert(3, 103, 4, "Boston", "2024-11-16 11:00"));    
-    alertHeap.insert(Alert(4, 104, 10, "San diego", "2024-11-16 12:00"));
-    
-    cout << "Alerts in Max-Heap:" << endl;    
-    alertHeap.displayHeap();    
-    cout << endl;
-    
-    cout << "Processing Alerts by Priority:" << endl;    
-    while (!alertHeap.isEmpty()) {        
-        Alert alert = alertHeap.extractMax();        
-        cout << "Processing: " << alert << endl;    
-    }
-    
+    animatePrint("Thanks.txt");
     return 0;
 }
-
-
-
