@@ -1134,8 +1134,7 @@ private:
     }
 };
 
-class Shelter {
-public:
+struct Shelter {
     string name;
     int capacity;
     int available_space;
@@ -1146,8 +1145,7 @@ public:
         : name(n), capacity(cap), available_space(avail), latitude(lat), longitude(lon) {}
 };
 
-class KDNode {
-public:
+struct KDNode {
     Shelter shelter;
     KDNode* left;
     KDNode* right;
@@ -1158,10 +1156,11 @@ public:
 class KDTree {
 private:
     KDNode* root;
-    const string filename = "shelter.txt";  // Filename for storing the data
+    const string filename = "shelter.txt";
 
     KDNode* insertRec(KDNode* node, Shelter shelter, unsigned depth) {
-        if (!node) return new KDNode(shelter);
+        if (!node)
+            return new KDNode(shelter);
 
         unsigned cd = depth % 2;
         if ((cd == 0 && shelter.latitude < node->shelter.latitude) || (cd == 1 && shelter.longitude < node->shelter.longitude))
@@ -1172,18 +1171,48 @@ private:
         return node;
     }
 
-    KDNode* searchRec(KDNode* node, const string& name) {
-        if (!node) return nullptr;
+    double distance(double lat1, double lon1, double lat2, double lon2) {
+        return sqrt(pow(lat1 - lat2, 2) + pow(lon1 - lon2, 2));
+    }
 
-        if (node->shelter.name == name) return node;
+    void searchNearestRec(KDNode* node, double lat, double lon, unsigned depth, KDNode*& best, double& bestDist) {
+        if (!node)
+            return;
+
+        double d = distance(lat, lon, node->shelter.latitude, node->shelter.longitude);
+        if (d < bestDist) {
+            bestDist = d;
+            best = node;
+        }
+
+        unsigned cd = depth % 2;
+        KDNode* nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
+            ? node->left
+            : node->right;
+        KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
+
+        searchNearestRec(nextBranch, lat, lon, depth + 1, best, bestDist);
+
+        if ((cd == 0 && fabs(lat - node->shelter.latitude) < bestDist) ||
+            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist)) {
+            searchNearestRec(otherBranch, lat, lon, depth + 1, best, bestDist);
+        }
+    }
+
+    KDNode* searchRec(KDNode* node, const string& name) {
+        if (!node)
+            return nullptr;
+
+        if (node->shelter.name == name)
+            return node;
 
         KDNode* leftResult = searchRec(node->left, name);
-        if (leftResult) return leftResult;
+        if (leftResult)
+            return leftResult;
 
         return searchRec(node->right, name);
     }
-
-    KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
+     KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
         if (!node) return nullptr;
 
         unsigned cd = depth % 2;
@@ -1221,9 +1250,9 @@ private:
         }
         return node;
     }
-
     void displaySheltersRec(KDNode* node) {
-        if (!node) return;
+        if (!node)
+            return;
 
         cout << "Shelter Name: " << node->shelter.name
              << ", Capacity: " << node->shelter.capacity
@@ -1233,7 +1262,6 @@ private:
         displaySheltersRec(node->left);
         displaySheltersRec(node->right);
     }
-
     void saveToFileRec(KDNode* node, ofstream& outfile) {
         if (!node) return;
 
@@ -1268,126 +1296,193 @@ private:
             addShelter(shelter);
         }
     }
-
 public:
     KDTree() : root(nullptr) {
-        loadFromFile();  // Automatically load data when the tree is created
+        loadData();
     }
 
     ~KDTree() {
-        saveToFile();  // Automatically save data when the program ends
+        saveData();
     }
 
+    void loadData() {
+        ifstream infile(filename);
+        if (!infile.is_open()) throw runtime_error("Could not open file for loading.");
+        loadFromFileRec(infile);
+        infile.close();
+        
+    }
+
+    void saveData() {
+       ofstream outfile(filename);
+        if (!outfile.is_open()) throw runtime_error("Could not open file for saving.");
+        saveToFileRec(root, outfile);
+        outfile.close();
+    }
+  Shelter searchShelterByName(const string &name)
+    {
+        KDNode *node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
+        return node->shelter;
+    }
+    
     void addShelter(Shelter shelter) {
         root = insertRec(root, shelter, 0);
     }
 
     void updateShelter(const string& name, int newCapacity, int newAvailableSpace) {
         KDNode* node = searchRec(root, name);
-        if (!node) throw runtime_error("Shelter not found.");
+        if (!node)
+            throw runtime_error("Shelter not found.");
         node->shelter.capacity = newCapacity;
         node->shelter.available_space = newAvailableSpace;
+        saveData();
     }
 
     void deleteShelter(const string& name) {
         root = deleteRec(root, name, 0);
+        saveData();
+    }
+
+    Shelter searchNearestShelter(double lat, double lon) {
+        KDNode* best = nullptr;
+        double bestDist = numeric_limits<double>::max();
+        searchNearestRec(root, lat, lon, 0, best, bestDist);
+        if (best)
+            return best->shelter;
+        throw runtime_error("No shelter found.");
+    }
+
+    int getAvailableSpace(const string& name) {
+        KDNode* node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
+        return node->shelter.available_space;
+    }
+
+    pair<double, double> getLocation(const string& name) {
+        KDNode* node = searchRec(root, name);
+        if (!node)
+            throw runtime_error("Shelter not found.");
+        return {node->shelter.latitude, node->shelter.longitude};
     }
 
     void displayShelters() {
         displaySheltersRec(root);
     }
-
-    void saveToFile() {
-        ofstream outfile(filename);
-        if (!outfile.is_open()) throw runtime_error("Could not open file for saving.");
-        saveToFileRec(root, outfile);
-        outfile.close();
-    }
-
-    void loadFromFile() {
-        ifstream infile(filename);
-        if (!infile.is_open()) throw runtime_error("Could not open file for loading.");
-        loadFromFileRec(infile);
-        infile.close();
-    }
 };
-
-void menu(KDTree& tree) {
-    int choice;
-    do {
-        cout << "\nMenu:\n";
-        cout << "1. Add Shelter\n";
-        cout << "2. Update Shelter\n";
-        cout << "3. Delete Shelter\n";
-        cout << "4. Display Shelters\n";
-        cout << "7. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        cin.ignore(); // To ignore the newline after entering choice
-
-        switch (choice) {
-            case 1: {
-                string name;
-                int capacity, available_space;
-                double latitude, longitude;
-                cout << "Enter shelter name: ";
-                getline(cin, name);
-                cout << "Enter shelter capacity: ";
-                cin >> capacity;
-                cout << "Enter available space: ";
-                cin >> available_space;
-                cout << "Enter latitude: ";
-                cin >> latitude;
-                cout << "Enter longitude: ";
-                cin >> longitude;
-
-                Shelter shelter(name, capacity, available_space, latitude, longitude);
-                tree.addShelter(shelter);
-                break;
-            }
-            case 2: {
-                string name;
-                int newCapacity, newAvailableSpace;
-                cout << "Enter shelter name to update: ";
-                getline(cin, name);
-                cout << "Enter new capacity: ";
-                cin >> newCapacity;
-                cout << "Enter new available space: ";
-                cin >> newAvailableSpace;
-
-                try {
-                    tree.updateShelter(name, newCapacity, newAvailableSpace);
-                    cout << "Shelter updated successfully!" << endl;
-                } catch (const runtime_error& e) {
-                    cout << e.what() << endl;
-                }
-                break;
-            }
-            case 3: {
-                string name;
-                cout << "Enter shelter name to delete: ";
-                getline(cin, name);
-
-                try {
-                    tree.deleteShelter(name);
-                    cout << "Shelter deleted successfully!" << endl;
-                } catch (const runtime_error& e) {
-                    cout << e.what() << endl;
-                }
-                break;
-            }
-            case 4:
-                tree.displayShelters();
-                break;
-            case 7:
-                cout << "Exiting program..." << endl;
-                break;
-            default:
-                cout << "Invalid choice, please try again!" << endl;
-        }
-    } while (choice != 7);
+void getAvailableSpaceForShelter(KDTree &tree) {
+    string name;
+    cout << "Enter the shelter name: ";
+    cin >> name;
+    int availableSpace = tree.getAvailableSpace(name);
+    cout << "Available space for " << name << ": " << availableSpace << endl;
 }
+
+
+void getLocationForShelter(KDTree &tree) {
+    string name;
+    cout << "Enter the shelter name: ";
+    cin >> name;
+    auto location = tree.getLocation(name);
+    cout << "Location of " << name << ": (" << location.first << ", " << location.second << ")" << endl;
+}
+
+void searchNearestShelter(KDTree &tree) {
+    double latitude, longitude;
+    cout << "Enter latitude: ";
+    cin >> latitude;
+    cout << "Enter longitude: ";
+    cin >> longitude;
+
+    Shelter nearest = tree.searchNearestShelter(latitude, longitude);
+    cout << "Nearest shelter: " << nearest.name << endl;
+}
+
+void searchShelterByNameFunction(KDTree &tree)
+{
+    string shelterName;
+    cout << "Enter the Shelter Name you want to search for: ";
+    getline(cin, shelterName);
+
+    try
+    {
+        Shelter foundShelter = tree.searchShelterByName(shelterName);
+        cout << "Shelter Name: " << foundShelter.name
+             << ", Capacity: " << foundShelter.capacity
+             << ", Available Space: " << foundShelter.available_space
+             << ", Location: (" << foundShelter.latitude << ", " << foundShelter.longitude << ")" << endl;
+    }
+    catch (const runtime_error &e)
+    {
+        cout << e.what() << endl;
+    }
+}
+
+void insertShelter(KDTree& tree) {
+    string name;
+    int capacity, available_space;
+    double latitude, longitude;
+
+    cout << "Enter Shelter Name: ";
+    getline(cin, name);
+    cout << "Enter Capacity: ";
+    cin >> capacity;
+    cout << "Enter Available Space: ";
+    cin >> available_space;
+    cout << "Enter Latitude: ";
+    cin >> latitude;
+    cout << "Enter Longitude: ";
+    cin >> longitude;
+    cin.ignore();  // Ignore newline character after cin
+
+    Shelter shelter(name, capacity, available_space, latitude, longitude);
+    tree.addShelter(shelter);
+    cout << "Shelter added successfully.\n";
+}
+
+void updateShelter(KDTree& tree) {
+    string name;
+    int newCapacity, newAvailableSpace;
+
+    cout << "Enter Shelter Name to update: ";
+    getline(cin, name);
+    cout << "Enter New Capacity: ";
+    cin >> newCapacity;
+    cout << "Enter New Available Space: ";
+    cin >> newAvailableSpace;
+    cin.ignore();
+
+    try {
+        tree.updateShelter(name, newCapacity, newAvailableSpace);
+        cout << "Shelter updated successfully.\n";
+    }
+    catch (const runtime_error& e) {
+        cout << e.what() << endl;
+    }
+}
+
+void deleteShelter(KDTree& tree) {
+    string name;
+
+    cout << "Enter Shelter Name to delete: ";
+    getline(cin, name);
+
+    try {
+        tree.deleteShelter(name);
+        cout << "Shelter deleted successfully.\n";
+    }
+    catch (const runtime_error& e) {
+        cout << e.what() << endl;
+    }
+}
+
+void displayShelters(KDTree& tree) {
+    cout << "\nList of Shelters:\n";
+    tree.displayShelters();
+}
+
 
 class RescueTeamManager {
 private:
@@ -1523,6 +1618,7 @@ private:
     }
     void showAdminMenu()
     {
+        KDTree tree;
         animatePrint("adminMenu.txt");
         while(true){
         cout << "\nAdmin Menu:" << endl;
@@ -1568,22 +1664,25 @@ private:
         // case 8:
         //     deleteRescueTeam();
         //     break;
-        // case 9:
-        //     addReliefCamp();
-        //     break;
-        // case 10:
-        //     updateReliefCamp();
-        //     break;
-        // case 11:
-        //     deleteReliefCamp();
-        //     break;
-        // case 12:
-        //     searchReliefCamp();
-        //     break;
-        // case 13:
-        //     displayAllReliefCamps();
-        //     break;
-        case 14:
+
+        case 7:
+            insertShelter(tree);
+            break;
+        case 8:
+            updateShelter(tree);
+            break;
+        case 9:
+            deleteShelter(tree);
+            break;
+        case 10:
+            searchShelterByNameFunction(tree);
+            break;
+
+        case 11:
+            displayShelters(tree);
+            break;
+        case 12:
+
             isLoggedIn = 0;
             break;
         default:
@@ -2033,6 +2132,7 @@ int main()
     // }
     // animatePrint("Logo.txt");
     // animatePrint("Welcome.txt");
+    KDTree tree; 
     DisasterManagementSystem dms;
     dms.run();
     animatePrint("Thanks.txt");
