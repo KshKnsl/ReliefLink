@@ -636,7 +636,7 @@ public:
     void AddToFile()
     {
         fstream file;
-        file.open("Disasters.dat", ios::out | ios::binary);
+        file.open("Disasters.txt", ios::out | ios::binary);
         AddToFile(root, 0, file);
         file.close();
         cout << 2 << endl;
@@ -912,6 +912,7 @@ public:
         cout << "Alert sent successfully for DisasterID " << disasterID << "!" << endl;
     }
 
+
     void updateAlert(int disasterID, int severity, const string &message, const string &time)
     {
         vector<Alert> temp;
@@ -953,6 +954,7 @@ public:
             tempQueue.pop();
         }
     }
+    friend class RescueTeamManager;
 };
 
 class MaxHeap
@@ -1487,10 +1489,11 @@ void displayShelters(KDTree& tree) {
 class RescueTeamManager {
 private:
     HashTable<Team> *team;
+    AlertManager*alert;
 //  Helper function to append a single team's data to the file
     void saveTeamToFile(){
         fstream file;
-        file.open("RescueTeam.dat",ios::out | ios::binary);
+        file.open("RescueTeam.txt",ios::out | ios::binary);
         if (!file) {
             cout << "Error opening file for writing.\n";
             return;
@@ -1503,6 +1506,7 @@ private:
 public:
     RescueTeamManager(){
         team=new HashTable<Team>(20);
+        alert=new AlertManager;
     }
     // Function to add a new rescue team
     void addRescueTeam(int teamID, const string& skillset, const string& location) {
@@ -1560,6 +1564,9 @@ public:
             }
         cout << "No team found with ID " << teamID << ".\n";
     }
+    void DisplayAlert(){
+        alert->displayAlerts();
+            }
     friend class DisasterManagementSystem;
 };
 
@@ -1655,15 +1662,15 @@ private:
         case 5:
             disasters->printTree();
             break;
-        // case 6:
-        //     addRescueTeam();
-        //     break;
-        // case 7:
-        //     updateRescueTeam();
-        //     break;
-        // case 8:
-        //     deleteRescueTeam();
-        //     break;
+        case 6:
+            addRescueTeam();
+            break;
+        case 7:
+            updateRescueTeam();
+            break;
+        case 8:
+            deleteRescueTeam();
+            break;
         case 9:
             insertShelter(tree);
             break;
@@ -1690,6 +1697,35 @@ private:
         }
         }
     }
+    void addRescueTeam(){
+        int id;
+        string skillset,location;
+        cout<<"Enter the Rescue Team ID: ";
+        cin>>id;
+        cout<<"Enter the Rescue Team skillset: ";
+        cin>>skillset;
+        cout<<"Location under Rescue Team: ";
+        cin>>location;
+        Rescue->addRescueTeam(id,skillset,location);
+    }
+    void updateRescueTeam(){
+        int id;
+        string skillset,location;
+        cout<<"Enter the Rescue Team ID: ";
+        cin>>id;
+        cout<<"Enter the Rescue Team New Skillset: ";
+        cin>>skillset;
+        cout<<"New Location under Rescue Team: ";
+        cin>>location;
+        Rescue->updateRescueTeam(id,skillset,location);
+    }
+    void deleteRescueTeam(){
+        int id;
+        string skillset,location;
+        cout<<"Enter the Rescue Team ID to be deleted: ";
+        cin>>id;
+        Rescue->deleteRescueTeam(id);
+    }
     void displayRequests()
     {
         // read the file request.txt completely
@@ -1707,7 +1743,7 @@ private:
         animatePrint("rescueMenu.txt");
         cout << "\nRescue Team Menu:" << endl;
         cout << "1. View Active Disasters" << endl;
-        cout << "2. Respond to Alert Calls" << endl;
+        cout << "2. Priority wise Alert Calls" << endl;
         cout << "3. Logout" << endl;
         int rescueTeamChoice;
 
@@ -1755,8 +1791,10 @@ private:
         cout << "Enter Disaster Type: ";
         cin >> type;
         cout << "Enter Status: ";
+                cin.ignore();
         cin >> status;
         cout << "Enter Date (YYYY-MM-DD): ";
+                cin.ignore();
         cin >> date;
         cout << "Enter Location (latitude longitude): ";
         cin >> lat >> lon;
@@ -1764,8 +1802,10 @@ private:
         cin.ignore();
         getline(cin, address);
         cout << "Enter City: ";
+        cin.ignore();
         getline(cin, city);
         cout << "Enter State: ";
+                cin.ignore();
         getline(cin, state);
         cout << "Enter Severity (1-5): ";
         cin >> severity;
@@ -2007,21 +2047,20 @@ public:
     void run()
     {
         fstream file;
-        file.open("Disasters.dat",ios::in | ios::binary);
+        file.open("Disasters.txt",ios::in | ios::binary);
         Disaster *D=new Disaster;
         while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
+            // cout<<&*D;
             disasters->insert(D);
             currentDisasterId=max(currentDisasterId,D->id);
         }
         currentDisasterId++;
         file.close();
-        file.open("RescueTeam.dat",ios::in | ios::binary);
+        file.open("RescueTeam.txt",ios::in | ios::binary);
         Team *R=new Team;
         while(file.read(reinterpret_cast<char *>(R),sizeof(Team))){
             Rescue->addRescueTeam(R);
-            currentDisasterId=max(currentDisasterId,D->id);
         }
-        currentDisasterId++;
         file.close();
         while (true)
         {
