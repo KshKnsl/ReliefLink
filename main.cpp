@@ -1315,6 +1315,105 @@ public:
     }
 };
 
+
+class RescueTeamManager {
+private:
+    struct Team {
+        int teamID;
+        string skillset;
+        string location;
+        string status; // Active or Removed
+    };
+
+    vector<Team> teams; // Vector to store rescue teams
+
+    // Helper function to append a single team's data to the file
+    void saveTeamToFile(const Team& team, const string& filename) const {
+        ofstream outFile(filename, ios::app); // Open file in append mode
+        if (!outFile) {
+            cout << "Error opening file " << filename << " for writing.\n";
+            return;
+        }
+
+        outFile << "Team ID: " << team.teamID 
+                << ", Skillset: " << team.skillset 
+                << ", Location: " << team.location 
+                << ", Status: " << team.status << endl;
+
+        outFile.close();
+    }
+
+public:
+    // Function to add a new rescue team
+    void addRescueTeam(int teamID, const string& skillset, const string& location) {
+        for (const auto& team : teams) {
+            if (team.teamID == teamID) {
+                cout << "Team with ID " << teamID << " already exists. Cannot add duplicate team.\n";
+                return;
+            }
+        }
+
+        // Add the team to the vector
+        Team newTeam = {teamID, skillset, location, "Active"};
+        teams.push_back(newTeam);
+
+        // Save the team to the file immediately
+        saveTeamToFile(newTeam, "rescueteam.txt");
+
+        cout << "Rescue team added successfully.\n";
+    }
+
+    // Function to display all rescue teams
+    void displayTeams() const {
+        if (teams.empty()) {
+            cout << "No rescue teams available.\n";
+            return;
+        }
+
+        cout << "\nRescue Teams:\n";
+        for (const auto& team : teams) {
+            cout << "Team ID: " << team.teamID 
+                 << ", Skillset: " << team.skillset 
+                 << ", Location: " << team.location 
+                 << ", Status: " << team.status << endl;
+        }
+    }
+
+    // Function to delete a rescue team
+    void deleteRescueTeam(int teamID) {
+        for (auto& team : teams) {
+            if (team.teamID == teamID) {
+                if (team.status == "Removed") {
+                    cout << "Team with ID " << teamID << " is already removed.\n";
+                    return;
+                }
+                team.status = "Removed";
+                cout << "Rescue team with ID " << teamID << " has been removed.\n";
+                return;
+            }
+        }
+        cout << "No team found with ID " << teamID << ".\n";
+    }
+
+    // Function to update a rescue team's details
+    void updateRescueTeam(int teamID, const string& newSkillset, const string& newLocation) {
+        for (auto& team : teams) {
+            if (team.teamID == teamID) {
+                if (team.status == "Removed") {
+                    cout << "Cannot update details for a removed team.\n";
+                    return;
+                }
+                team.skillset = newSkillset;
+                team.location = newLocation;
+                cout << "Rescue team with ID " << teamID << " has been updated.\n";
+                return;
+            }
+        }
+        cout << "No team found with ID " << teamID << ".\n";
+    }
+};
+
+
 class DisasterManagementSystem
 {
 private:
@@ -1374,15 +1473,16 @@ private:
         cout << "1. Add Disaster" << endl;
         cout << "2. Update Disaster" << endl;
         cout << "3. Delete Disaster" << endl;
-        cout << "4. Add Rescue Team" << endl;
-        cout << "5. Update Rescue Team" << endl;
-        cout << "6. Delete Rescue Team" << endl;
-        cout << "7. Add Relief Camp" << endl;
-        cout << "8. Update Relief Camp" << endl;
-        cout << "9. Delete Relief Camp" << endl;
-        cout << "10. Search Relief Camp" << endl;
-        cout << "11. Display All Relief Camps" << endl;
-        cout << "12. Logout" << endl;
+        cout << "4. Display Disaster" << endl;
+        cout << "5. Add Rescue Team" << endl;
+        cout << "6. Update Rescue Team" << endl;
+        cout << "7. Delete Rescue Team" << endl;
+        cout << "8. Add Relief Camp" << endl;
+        cout << "9. Update Relief Camp" << endl;
+        cout << "10. Delete Relief Camp" << endl;
+        cout << "11. Search Relief Camp" << endl;
+        cout << "12. Display All Relief Camps" << endl;
+        cout << "13. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
@@ -1393,9 +1493,12 @@ private:
         case 2:
             updateDisaster();
             break;
-        // case 3:
-        //     deleteDisaster();
-        //     break;
+        case 3:
+            disasters->remove(1);
+            break;
+        case 4:
+            disasters->printTree();
+            break;
         // case 4:
         //     addRescueTeam();
         //     break;
@@ -1426,6 +1529,9 @@ private:
             break;
         default:
             cout << RED << "Invalid choice, please try again." << RESET << endl;
+        }
+        if(isLoggedIn==0){
+            break;
         }
         }
     }
@@ -1709,7 +1815,7 @@ private:
     }
 
 public:
-    DisasterManagementSystem() : currentDisasterId(1), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
+    DisasterManagementSystem() : currentDisasterId(0), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
         disasters = new BPlusTree<Disaster>(5);
         loadUsers();
@@ -1724,8 +1830,8 @@ public:
             disasters->insert(D);
             currentDisasterId=max(currentDisasterId,D->id);
         }
+        currentDisasterId++;
         file.close();
-        // disasters->printTree();
         while (true)
         {
             if (isLoggedIn == 0)
@@ -1795,6 +1901,8 @@ public:
         disasters->AddToFile();
     }
 };
+
+
 
 int main()
 {
