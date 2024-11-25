@@ -519,18 +519,18 @@ private:
             }
         }
     }
-    
-    void AddToFile(Node *node, int level,fstream &file)
+
+    void AddToFile(Node *node, int level, fstream &file)
     {
         if (node != nullptr)
         {
             for (auto key : node->keys)
             {
-                file.write(reinterpret_cast<char *>(key),sizeof(Disaster));
+                file.write(reinterpret_cast<char *>(key), sizeof(Disaster));
             }
             for (Node *child : node->children)
             {
-                AddToFile(child, level + 1,file);
+                AddToFile(child, level + 1, file);
             }
         }
     }
@@ -608,12 +608,13 @@ public:
     {
         AddDisasterToHash(H, root, 0);
     }
-    void AddToFile(){
+    void AddToFile()
+    {
         fstream file;
         file.open("Disasters.dat", ios::out | ios::binary);
         AddToFile(root, 0, file);
         file.close();
-        cout<<2<<endl;
+        cout << 2 << endl;
     }
 };
 
@@ -1017,6 +1018,7 @@ public:
 class Trie
 {
 private:
+    
     TrieNode *root;
     void dfsHelper(TrieNode *node, string prefix, vector<string> &results)
     {
@@ -1033,6 +1035,18 @@ private:
 
 public:
     Trie() : root(new TrieNode()) {}
+    void insertCsvtoTrie(Trie *trie, const string &filename)
+    {
+        int i=0;
+        ifstream file(filename);
+        string allData,line;
+        while (i<180 && getline(file, line))
+        {
+            allData += line;
+        }
+        trie->insertBulk(allData);
+        file.close();
+    }
     void insert(string word)
     {
         TrieNode *current = root;
@@ -1301,8 +1315,6 @@ public:
     }
 };
 
-
-
 class DisasterManagementSystem
 {
 private:
@@ -1312,6 +1324,7 @@ private:
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
     RoutingSystem routingSystem;
+    Trie trie;
 
     int currentDisasterId;
     int currentTeamId;
@@ -1524,8 +1537,28 @@ private:
     }
     void requestHelp()
     {
+        trie.insertCsvtoTrie(&trie, "noida_city_graph.csv");
         string location;
         cout << "Enter your location: ";
+        getline(cin,location);
+        getline(cin,location);
+        vector<string> suggestions = trie.autocomplete(location);
+        if (suggestions.empty())
+        {
+            cout << "No suggestions found for your location." << endl;
+            return;
+        }
+        cout << "Did you mean:" << endl;
+        int sugg=1;
+        for (const string &suggestion : suggestions)
+        {
+            cout << sugg++ <<"."<< suggestion << endl;
+        }
+        cout << "Enter the correct location no: ";
+        int op;
+        cin >> op;
+        location = suggestions[op-1];
+
         vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
         if (!path.empty())
         {
@@ -1537,10 +1570,6 @@ private:
                     cout << " -> ";
             }
             cout << endl;
-        }
-        else
-        {
-            cout << "No valid path to the nearest relief camp." << endl;
         }
     }
 
@@ -1715,13 +1744,15 @@ public:
         loadUsers();
         loadRescueUsers();
     }
-    void run(){
+    void run()
+    {
         fstream file;
-        file.open("Disasters.dat",ios::in | ios::binary);
-        Disaster *D=new Disaster;
-        while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
+        file.open("Disasters.dat", ios::in | ios::binary);
+        Disaster *D = new Disaster;
+        while (file.read(reinterpret_cast<char *>(D), sizeof(Disaster)))
+        {
             disasters->insert(D);
-            cout<<1<<endl;
+            cout << 1 << endl;
         }
         file.close();
         disasters->printTree();
@@ -1795,8 +1826,6 @@ public:
         disasters->AddToFile();
     }
 };
-
-
 
 int main()
 {
