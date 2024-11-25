@@ -1423,6 +1423,12 @@ public:
         cout << "Rescue team added successfully.\n";
     }
 
+    void addRescueTeam(Team *R) {
+        // Add the team to the vector
+        team->Insert(R);
+        cout << "Rescue team added successfully.\n";
+    }
+
     // Function to display all rescue teams
     void displayTeams() const {
         cout << "\nRescue Teams:\n";
@@ -1459,6 +1465,7 @@ public:
             }
         cout << "No team found with ID " << teamID << ".\n";
     }
+    friend class DisasterManagementSystem;
 };
 
 
@@ -1467,7 +1474,7 @@ class DisasterManagementSystem
 {
 private:
     BPlusTree<Disaster> *disasters;
-    map<int, RescueTeam> rescueTeams;
+    RescueTeamManager * Rescue;
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
@@ -1869,7 +1876,7 @@ cout << "Help requested successfully!" << endl;
         cout << "Enter team ID to assign: ";
         cin >> teamId;
         // Will change according to rescue team
-        if (rescueTeams.find(teamId) == rescueTeams.end())
+        if (Rescue->team->Search(teamId)==NULL)
         {
             cout << RED << "Invalid team ID." << RESET << endl;
             return;
@@ -1896,6 +1903,7 @@ cout << "Help requested successfully!" << endl;
 public:
     DisasterManagementSystem() : currentDisasterId(0), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
+        Rescue=new RescueTeamManager;
         disasters = new BPlusTree<Disaster>(5);
         loadUsers();
         loadRescueUsers();
@@ -1907,6 +1915,14 @@ public:
         Disaster *D=new Disaster;
         while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
             disasters->insert(D);
+            currentDisasterId=max(currentDisasterId,D->id);
+        }
+        currentDisasterId++;
+        file.close();
+        file.open("RescueTeam.dat",ios::in | ios::binary);
+        Team *R=new Team;
+        while(file.read(reinterpret_cast<char *>(R),sizeof(Team))){
+            Rescue->addRescueTeam(R);
             currentDisasterId=max(currentDisasterId,D->id);
         }
         currentDisasterId++;
