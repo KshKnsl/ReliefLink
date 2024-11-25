@@ -1573,37 +1573,6 @@ private:
         }
     }
 
-    void reportDisaster()
-    {
-        string disasterType, status, date;
-        double latitude, longitude;
-        int severity, affectedPopulation;
-        string address, city, state;
-
-        cout << "Enter disaster type: ";
-        cin >> disasterType;
-        cout << "Enter status (e.g., ongoing, resolved): ";
-        cin >> status;
-        cout << "Enter date (YYYY-MM-DD): ";
-        cin >> date;
-        cout << "Enter latitude and longitude of disaster: ";
-        cin >> latitude >> longitude;
-        cout << "Enter Address: ";
-        cin >> address;
-        cout << "Enter City: ";
-        cin >> city;
-        cout << "Enter State: ";
-        cin >> state;
-        cout << "Enter severity (1 to 5): ";
-        cin >> severity;
-        cout << "Enter affected population: ";
-        cin >> affectedPopulation;
-
-        Location loc(latitude, longitude, address, city, state);
-        Disaster *D = new Disaster(currentDisasterId++, disasterType, loc, severity, status, date, affectedPopulation, {}, {});
-        disasters->insert(D);
-        cout << GREEN << "Disaster reported successfully!" << RESET << endl;
-    }
 
     void viewAllDisasters()
     {
@@ -1747,16 +1716,14 @@ public:
     void run()
     {
         fstream file;
-        file.open("Disasters.dat", ios::in | ios::binary);
-        Disaster *D = new Disaster;
-        while (file.read(reinterpret_cast<char *>(D), sizeof(Disaster)))
-        {
+        file.open("Disasters.dat",ios::in | ios::binary);
+        Disaster *D=new Disaster;
+        while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
             disasters->insert(D);
-            cout << 1 << endl;
+            cout<<1<<endl;
         }
         file.close();
         disasters->printTree();
-        showAdminMenu();
         while (true)
         {
             if (isLoggedIn == 0)
@@ -1859,8 +1826,8 @@ int main()
     //     Alert alert = alertHeap.extractMax();
     //     cout << "Processing: " << alert << endl;
     // }
-    animatePrint("Logo.txt");
-    animatePrint("Welcome.txt");
+    // animatePrint("Logo.txt");
+    // animatePrint("Welcome.txt");
     DisasterManagementSystem dms;
     dms.run();
     animatePrint("Thanks.txt");
