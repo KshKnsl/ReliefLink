@@ -1424,7 +1424,7 @@ void insertShelter(KDTree& tree) {
     string name;
     int capacity, available_space;
     double latitude, longitude;
-
+cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter Shelter Name: ";
     getline(cin, name);
     cout << "Enter Capacity: ";
@@ -1664,25 +1664,22 @@ private:
         // case 8:
         //     deleteRescueTeam();
         //     break;
-
-        case 7:
+        case 9:
             insertShelter(tree);
             break;
-        case 8:
+        case 10:
             updateShelter(tree);
             break;
-        case 9:
+        case 11:
             deleteShelter(tree);
             break;
-        case 10:
+        case 12:
             searchShelterByNameFunction(tree);
             break;
-
-        case 11:
+        case 13:
             displayShelters(tree);
             break;
-        case 12:
-
+        case 14:
             isLoggedIn = 0;
             break;
         default:
