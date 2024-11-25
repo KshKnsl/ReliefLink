@@ -366,70 +366,55 @@ private:
     }
 
     // Implementation of remove function
-    void remove(Node *node, int key)
-    {
-        // If node is a leaf
-        if (node->isLeaf)
-        {
-            auto it = find(node->keys.begin(), node->keys.end(), key);
-            if (it != node->keys.end())
-            {
+    void remove(Node *node, int key) {
+        if (node->isLeaf) {
+            auto it = std::find_if(node->keys.begin(), node->keys.end(),
+                                   [key](const T *obj) { return obj->id == key; });
+            if (it != node->keys.end()) {
                 node->keys.erase(it);
             }
-        }
-        else
-        {
-            int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
-            if (idx < node->keys.size() && node->keys[idx]->id == key)
-            {
-                if (node->children[idx]->keys.size() >= t)
-                {
+        } 
+        else {
+            int idx = std::lower_bound(node->keys.begin(), node->keys.end(), key,
+                                       [](const T *a, int b) { return a->id < b; }) -
+                      node->keys.begin();
+
+            if (idx < node->keys.size() && node->keys[idx]->id == key) {
+                if (node->children[idx]->keys.size() >= t) {
                     Node *predNode = node->children[idx];
-                    while (!predNode->isLeaf)
-                    {
+                    while (!predNode->isLeaf) {
                         predNode = predNode->children.back();
                     }
                     T *pred = predNode->keys.back();
                     node->keys[idx] = pred;
-                    remove(node->children[idx], pred);
-                }
-                else if (node->children[idx + 1]->keys.size() >= t)
-                {
+                    remove(node->children[idx], pred->id);
+                } 
+                else if (node->children[idx + 1]->keys.size() >= t) {
                     Node *succNode = node->children[idx + 1];
-                    while (!succNode->isLeaf)
-                    {
+                    while (!succNode->isLeaf) {
                         succNode = succNode->children.front();
                     }
                     T *succ = succNode->keys.front();
                     node->keys[idx] = succ;
-                    remove(node->children[idx + 1], succ);
-                }
-                else
-                {
+                    remove(node->children[idx + 1], succ->id);
+                } 
+                else {
                     merge(node, idx);
                     remove(node->children[idx], key);
                 }
-            }
-            else
-            {
-                if (node->children[idx]->keys.size() < t)
-                {
-                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t)
-                    {
+            } 
+            else {
+                if (node->children[idx]->keys.size() < t) {
+                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t) {
                         borrowFromPrev(node, idx);
-                    }
-                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t)
-                    {
+                    } 
+                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t) {
                         borrowFromNext(node, idx);
-                    }
-                    else
-                    {
-                        if (idx < node->children.size() - 1)
-                        {
+                    } 
+                    else {
+                        if (idx < node->children.size() - 1) {
                             merge(node, idx);
-                        }
-                        else
-                        {
+                        } else {
                             merge(node, idx - 1);
                         }
                     }
