@@ -203,6 +203,36 @@ ostream &operator<<(ostream &os, const Disaster *D)
     return os;
 }
 
+class Team {
+private:
+    int id;
+    string skillset;
+    string location;
+    string status;
+public:
+    Team(){};
+    Team(int id,string skillset,string location, string status){
+        this->id=id;
+        this->skillset=skillset;
+        this->location=location;
+        this->status=status;
+    }
+    friend class RescueTeamManager;
+    template <typename T>
+    friend class HashTable;
+    friend ostream &operator<<(ostream &os, const Team *D);
+};
+ostream &operator<<(ostream &os, const Team *T)
+{
+    os << "Team ID: " << T->id<<endl;
+    os<< "Skillset: " << T->skillset<<endl;
+    os<< "Location: " << T->location<<endl;
+    os<< "Status: " << T->status << endl;
+    return os;
+}
+
+
+
 template <typename T>
 class HashTable
 {
@@ -290,6 +320,11 @@ public:
     void Display(){
         for(auto k:V){
             cout<<k<<endl;
+        }
+    }
+    void HashToFile(fstream &file){
+        for(auto k:V){
+            file.write(reinterpret_cast<char *>(k),sizeof(Team));
         }
     }
 };
@@ -1354,51 +1389,21 @@ void menu(KDTree& tree) {
     } while (choice != 7);
 }
 
-class Team {
-private:
-    int id;
-    string skillset;
-    string location;
-    string status;
-public:
-    Team(){};
-    Team(int id,string skillset,string location, string status){
-        this->id=id;
-        this->skillset=skillset;
-        this->location=location;
-        this->status=status;
-    }
-    friend class RescueTeamManager;
-    template <typename T>
-    friend class HashTable;
-    friend ostream &operator<<(ostream &os, const Team *D);
-};
-ostream &operator<<(ostream &os, const Team *T)
-{
-    os << "Team ID: " << T->id<<endl;
-    os<< "Skillset: " << T->skillset<<endl;
-    os<< "Location: " << T->location<<endl;
-    os<< "Status: " << T->status << endl;
-    return os;
-}
 class RescueTeamManager {
 private:
     HashTable<Team> *team;
-    // Helper function to append a single team's data to the file
-//    void saveTeamToFile(const string& filename) const {
-//        ofstream outFile(filename, ios::app); // Open file in append mode
-//        if (!outFile) {
-//            cout << "Error opening file " << filename << " for writing.\n";
-//            return;
-//        }
-//
-//        outFile << "Team ID: " << team.teamID
-//                << ", Skillset: " << team.skillset
-//                << ", Location: " << team.location
-//                << ", Status: " << team.status << endl;
-//
-//        outFile.close();
-//    }
+//  Helper function to append a single team's data to the file
+    void saveTeamToFile(){
+        fstream file;
+        file.open("RescueTeam.dat",ios::out | ios::binary);
+        if (!file) {
+            cout << "Error opening file for writing.\n";
+            return;
+        }
+
+        team->HashToFile(file);
+        file.close();
+    }
 
 public:
     RescueTeamManager(){
