@@ -257,7 +257,7 @@ public:
         }
     }
 
-    Disaster *Search(int k)
+    T* Search(int k)
     {
         int pos = Hash(k);
         int i = 1;
@@ -285,6 +285,11 @@ public:
             }
             pos = Hash(k, i);
             i++;
+        }
+    }
+    void Display(){
+        for(auto k:V){
+            cout<<k<<endl;
         }
     }
 };
@@ -1364,102 +1369,108 @@ void menu(KDTree& tree) {
     } while (choice != 7);
 }
 
+class Team {
+private:
+    int id;
+    string skillset;
+    string location;
+    string status;
+public:
+    Team(){};
+    Team(int id,string skillset,string location, string status){
+        this->id=id;
+        this->skillset=skillset;
+        this->location=location;
+        this->status=status;
+    }
+    friend class RescueTeamManager;
+    template <typename T>
+    friend class HashTable;
+    friend ostream &operator<<(ostream &os, const Team *D);
+};
+ostream &operator<<(ostream &os, const Team *T)
+{
+    os << "Team ID: " << T->id<<endl;
+    os<< "Skillset: " << T->skillset<<endl;
+    os<< "Location: " << T->location<<endl;
+    os<< "Status: " << T->status << endl;
+    return os;
+}
 class RescueTeamManager {
 private:
-    struct Team {
-        int teamID;
-        string skillset;
-        string location;
-        string status; // Active or Removed
-    };
-
-    vector<Team> teams; // Vector to store rescue teams
-
+    HashTable<Team> *team;
     // Helper function to append a single team's data to the file
-    void saveTeamToFile(const Team& team, const string& filename) const {
-        ofstream outFile(filename, ios::app); // Open file in append mode
-        if (!outFile) {
-            cout << "Error opening file " << filename << " for writing.\n";
-            return;
-        }
-
-        outFile << "Team ID: " << team.teamID 
-                << ", Skillset: " << team.skillset 
-                << ", Location: " << team.location 
-                << ", Status: " << team.status << endl;
-
-        outFile.close();
-    }
+//    void saveTeamToFile(const string& filename) const {
+//        ofstream outFile(filename, ios::app); // Open file in append mode
+//        if (!outFile) {
+//            cout << "Error opening file " << filename << " for writing.\n";
+//            return;
+//        }
+//
+//        outFile << "Team ID: " << team.teamID
+//                << ", Skillset: " << team.skillset
+//                << ", Location: " << team.location
+//                << ", Status: " << team.status << endl;
+//
+//        outFile.close();
+//    }
 
 public:
+    RescueTeamManager(){
+        team=new HashTable<Team>(20);
+    }
     // Function to add a new rescue team
     void addRescueTeam(int teamID, const string& skillset, const string& location) {
-        for (const auto& team : teams) {
-            if (team.teamID == teamID) {
+        Team *T=team->Search(teamID);
+            if (T != NULL) {
                 cout << "Team with ID " << teamID << " already exists. Cannot add duplicate team.\n";
                 return;
             }
-        }
 
         // Add the team to the vector
-        Team newTeam = {teamID, skillset, location, "Active"};
-        teams.push_back(newTeam);
-
-        // Save the team to the file immediately
-        saveTeamToFile(newTeam, "rescueteam.txt");
-
+        Team *newTeam = new Team(teamID, skillset, location, "Active");
+        team->Insert(newTeam);
         cout << "Rescue team added successfully.\n";
     }
 
     // Function to display all rescue teams
     void displayTeams() const {
-        if (teams.empty()) {
-            cout << "No rescue teams available.\n";
-            return;
-        }
-
         cout << "\nRescue Teams:\n";
-        for (const auto& team : teams) {
-            cout << "Team ID: " << team.teamID 
-                 << ", Skillset: " << team.skillset 
-                 << ", Location: " << team.location 
-                 << ", Status: " << team.status << endl;
-        }
+        team->Display();
     }
 
     // Function to delete a rescue team
     void deleteRescueTeam(int teamID) {
-        for (auto& team : teams) {
-            if (team.teamID == teamID) {
-                if (team.status == "Removed") {
+        Team * T=team->Search(teamID);
+            if (T!=NULL) {
+                if (T->status == "Removed") {
                     cout << "Team with ID " << teamID << " is already removed.\n";
                     return;
                 }
-                team.status = "Removed";
+                T->status = "Removed";
                 cout << "Rescue team with ID " << teamID << " has been removed.\n";
                 return;
             }
-        }
         cout << "No team found with ID " << teamID << ".\n";
     }
 
     // Function to update a rescue team's details
     void updateRescueTeam(int teamID, const string& newSkillset, const string& newLocation) {
-        for (auto& team : teams) {
-            if (team.teamID == teamID) {
-                if (team.status == "Removed") {
-                    cout << "Cannot update details for a removed team.\n";
+        Team * T=team->Search(teamID);
+            if (T!=NULL) {
+                if (T->status == "Removed") {
+                    cout << "Team with ID " << teamID << " is already removed.\n";
                     return;
                 }
-                team.skillset = newSkillset;
-                team.location = newLocation;
+                T->skillset = newSkillset;
+                T->location = newLocation;
                 cout << "Rescue team with ID " << teamID << " has been updated.\n";
                 return;
             }
-        }
         cout << "No team found with ID " << teamID << ".\n";
     }
 };
+
 
 
 class DisasterManagementSystem
