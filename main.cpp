@@ -203,6 +203,36 @@ ostream &operator<<(ostream &os, const Disaster *D)
     return os;
 }
 
+class Team {
+private:
+    int id;
+    string skillset;
+    string location;
+    string status;
+public:
+    Team(){};
+    Team(int id,string skillset,string location, string status){
+        this->id=id;
+        this->skillset=skillset;
+        this->location=location;
+        this->status=status;
+    }
+    friend class RescueTeamManager;
+    template <typename T>
+    friend class HashTable;
+    friend ostream &operator<<(ostream &os, const Team *D);
+};
+ostream &operator<<(ostream &os, const Team *T)
+{
+    os << "Team ID: " << T->id<<endl;
+    os<< "Skillset: " << T->skillset<<endl;
+    os<< "Location: " << T->location<<endl;
+    os<< "Status: " << T->status << endl;
+    return os;
+}
+
+
+
 template <typename T>
 class HashTable
 {
@@ -257,7 +287,7 @@ public:
         }
     }
 
-    Disaster *Search(int k)
+    T* Search(int k)
     {
         int pos = Hash(k);
         int i = 1;
@@ -285,6 +315,16 @@ public:
             }
             pos = Hash(k, i);
             i++;
+        }
+    }
+    void Display(){
+        for(auto k:V){
+            cout<<k<<endl;
+        }
+    }
+    void HashToFile(fstream &file){
+        for(auto k:V){
+            file.write(reinterpret_cast<char *>(k),sizeof(Team));
         }
     }
 };
@@ -361,70 +401,55 @@ private:
     }
 
     // Implementation of remove function
-    void remove(Node *node, int key)
-    {
-        // If node is a leaf
-        if (node->isLeaf)
-        {
-            auto it = find(node->keys.begin(), node->keys.end(), key);
-            if (it != node->keys.end())
-            {
+    void remove(Node *node, int key) {
+        if (node->isLeaf) {
+            auto it = std::find_if(node->keys.begin(), node->keys.end(),
+                                   [key](const T *obj) { return obj->id == key; });
+            if (it != node->keys.end()) {
                 node->keys.erase(it);
             }
-        }
-        else
-        {
-            int idx = lower_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin();
-            if (idx < node->keys.size() && node->keys[idx]->id == key)
-            {
-                if (node->children[idx]->keys.size() >= t)
-                {
+        } 
+        else {
+            int idx = std::lower_bound(node->keys.begin(), node->keys.end(), key,
+                                       [](const T *a, int b) { return a->id < b; }) -
+                      node->keys.begin();
+
+            if (idx < node->keys.size() && node->keys[idx]->id == key) {
+                if (node->children[idx]->keys.size() >= t) {
                     Node *predNode = node->children[idx];
-                    while (!predNode->isLeaf)
-                    {
+                    while (!predNode->isLeaf) {
                         predNode = predNode->children.back();
                     }
                     T *pred = predNode->keys.back();
                     node->keys[idx] = pred;
-                    remove(node->children[idx], pred);
-                }
-                else if (node->children[idx + 1]->keys.size() >= t)
-                {
+                    remove(node->children[idx], pred->id);
+                } 
+                else if (node->children[idx + 1]->keys.size() >= t) {
                     Node *succNode = node->children[idx + 1];
-                    while (!succNode->isLeaf)
-                    {
+                    while (!succNode->isLeaf) {
                         succNode = succNode->children.front();
                     }
                     T *succ = succNode->keys.front();
                     node->keys[idx] = succ;
-                    remove(node->children[idx + 1], succ);
-                }
-                else
-                {
+                    remove(node->children[idx + 1], succ->id);
+                } 
+                else {
                     merge(node, idx);
                     remove(node->children[idx], key);
                 }
-            }
-            else
-            {
-                if (node->children[idx]->keys.size() < t)
-                {
-                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t)
-                    {
+            } 
+            else {
+                if (node->children[idx]->keys.size() < t) {
+                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t) {
                         borrowFromPrev(node, idx);
-                    }
-                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t)
-                    {
+                    } 
+                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t) {
                         borrowFromNext(node, idx);
-                    }
-                    else
-                    {
-                        if (idx < node->children.size() - 1)
-                        {
+                    } 
+                    else {
+                        if (idx < node->children.size() - 1) {
                             merge(node, idx);
-                        }
-                        else
-                        {
+                        } else {
                             merge(node, idx - 1);
                         }
                     }
@@ -1461,100 +1486,76 @@ void displayShelters(KDTree& tree) {
 
 class RescueTeamManager {
 private:
-    struct Team {
-        int teamID;
-        string skillset;
-        string location;
-        string status; // Active or Removed
-    };
-
-    vector<Team> teams; // Vector to store rescue teams
-
-    // Helper function to append a single team's data to the file
-    void saveTeamToFile(const Team& team, const string& filename) const {
-        ofstream outFile(filename, ios::app); // Open file in append mode
-        if (!outFile) {
-            cout << "Error opening file " << filename << " for writing.\n";
+    HashTable<Team> *team;
+//  Helper function to append a single team's data to the file
+    void saveTeamToFile(){
+        fstream file;
+        file.open("RescueTeam.dat",ios::out | ios::binary);
+        if (!file) {
+            cout << "Error opening file for writing.\n";
             return;
         }
 
-        outFile << "Team ID: " << team.teamID 
-                << ", Skillset: " << team.skillset 
-                << ", Location: " << team.location 
-                << ", Status: " << team.status << endl;
-
-        outFile.close();
+        team->HashToFile(file);
+        file.close();
     }
 
 public:
+    RescueTeamManager(){
+        team=new HashTable<Team>(20);
+    }
     // Function to add a new rescue team
     void addRescueTeam(int teamID, const string& skillset, const string& location) {
-        for (const auto& team : teams) {
-            if (team.teamID == teamID) {
+        Team *T=team->Search(teamID);
+            if (T != NULL) {
                 cout << "Team with ID " << teamID << " already exists. Cannot add duplicate team.\n";
                 return;
             }
-        }
 
         // Add the team to the vector
-        Team newTeam = {teamID, skillset, location, "Active"};
-        teams.push_back(newTeam);
-
-        // Save the team to the file immediately
-        saveTeamToFile(newTeam, "rescueteam.txt");
-
+        Team *newTeam = new Team(teamID, skillset, location, "Active");
+        team->Insert(newTeam);
         cout << "Rescue team added successfully.\n";
     }
 
     // Function to display all rescue teams
     void displayTeams() const {
-        if (teams.empty()) {
-            cout << "No rescue teams available.\n";
-            return;
-        }
-
         cout << "\nRescue Teams:\n";
-        for (const auto& team : teams) {
-            cout << "Team ID: " << team.teamID 
-                 << ", Skillset: " << team.skillset 
-                 << ", Location: " << team.location 
-                 << ", Status: " << team.status << endl;
-        }
+        team->Display();
     }
 
     // Function to delete a rescue team
     void deleteRescueTeam(int teamID) {
-        for (auto& team : teams) {
-            if (team.teamID == teamID) {
-                if (team.status == "Removed") {
+        Team * T=team->Search(teamID);
+            if (T!=NULL) {
+                if (T->status == "Removed") {
                     cout << "Team with ID " << teamID << " is already removed.\n";
                     return;
                 }
-                team.status = "Removed";
+                T->status = "Removed";
                 cout << "Rescue team with ID " << teamID << " has been removed.\n";
                 return;
             }
-        }
         cout << "No team found with ID " << teamID << ".\n";
     }
 
     // Function to update a rescue team's details
     void updateRescueTeam(int teamID, const string& newSkillset, const string& newLocation) {
-        for (auto& team : teams) {
-            if (team.teamID == teamID) {
-                if (team.status == "Removed") {
-                    cout << "Cannot update details for a removed team.\n";
+        Team * T=team->Search(teamID);
+            if (T!=NULL) {
+                if (T->status == "Removed") {
+                    cout << "Team with ID " << teamID << " is already removed.\n";
                     return;
                 }
-                team.skillset = newSkillset;
-                team.location = newLocation;
+                T->skillset = newSkillset;
+                T->location = newLocation;
                 cout << "Rescue team with ID " << teamID << " has been updated.\n";
                 return;
             }
-        }
         cout << "No team found with ID " << teamID << ".\n";
     }
 };
+
 
 
 class DisasterManagementSystem
@@ -1614,44 +1615,49 @@ private:
         animatePrint("adminMenu.txt");
         while(true){
         cout << "\nAdmin Menu:" << endl;
-        cout << "1. Add Disaster" << endl;
-        cout << "2. Update Disaster" << endl;
-        cout << "3. Delete Disaster" << endl;
-        cout << "4. Display Disaster" << endl;
-        cout << "5. Add Rescue Team" << endl;
-        cout << "6. Update Rescue Team" << endl;
-        cout << "7. Delete Rescue Team" << endl;
-        cout << "8. Add Relief Camp" << endl;
-        cout << "9. Update Relief Camp" << endl;
-        cout << "10. Delete Relief Camp" << endl;
-        cout << "11. Search Relief Camp" << endl;
-        cout << "12. Display All Relief Camps" << endl;
-        cout << "13. Logout" << endl;
+        cout << "1. Display Requests" << endl;
+        cout << "2. Add Disaster" << endl;
+        cout << "3. Update Disaster" << endl;
+        cout << "4. Delete Disaster" << endl;
+        cout << "5. Display Disaster" << endl;
+        cout << "6. Add Rescue Team" << endl;
+        cout << "7. Update Rescue Team" << endl;
+        cout << "8. Delete Rescue Team" << endl;
+        cout << "9. Add Relief Camp" << endl;
+        cout << "10. Update Relief Camp" << endl;
+        cout << "11. Delete Relief Camp" << endl;
+        cout << "12. Search Relief Camp" << endl;
+        cout << "13. Display All Relief Camps" << endl;
+        cout << "14. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
         {
         case 1:
+        displayRequests();
+        break;
+        case 2:
             addDisaster();
             break;
-        case 2:
+        case 3:
             updateDisaster();
             break;
-        case 3:
+        case 4:
             // disasters->remove(1);
             break;
-        case 4:
+        case 5:
             disasters->printTree();
             break;
-        // case 4:
+        // case 6:
         //     addRescueTeam();
         //     break;
-        // case 5:
+        // case 7:
         //     updateRescueTeam();
         //     break;
-        // case 6:
+        // case 8:
         //     deleteRescueTeam();
         //     break;
+
         case 7:
             insertShelter(tree);
             break;
@@ -1669,6 +1675,7 @@ private:
             displayShelters(tree);
             break;
         case 12:
+
             isLoggedIn = 0;
             break;
         default:
@@ -1677,6 +1684,18 @@ private:
         if(isLoggedIn==0){
             break;
         }
+        }
+    }
+    void displayRequests()
+    {
+        // read the file request.txt completely
+        ifstream file;
+        cout<<"Requests:"<<endl;
+        file.open("request.txt");
+        string line;
+        while (getline(file, line))
+        {
+            cout << line << endl;
         }
     }
     void showRescueTeamMenu()
@@ -1810,7 +1829,21 @@ private:
         int op;
         cin >> op;
         location = suggestions[op-1];
-
+        cout<< "Enter Disaster Type: ";
+        string type;
+        cin >> type;
+        cout << "Enter Disaster Severity: ";
+        int severity;
+        cin >> severity;
+        cout << "Enter Contact Number: ";
+        string contact;
+        cin >> contact;
+        ofstream file;
+        file.open("request.txt", ios::app);
+        file << "Location: " << location << ", Disaster Type: " << type << ", Severity: " << severity << ", Contact No."<< contact<<endl;
+        file.close();
+cout << "Help requested successfully!" << endl;
+        cout<< "Will reach you out soon!!"<<endl;
         vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
         if (!path.empty())
         {
@@ -1823,6 +1856,7 @@ private:
             }
             cout << endl;
         }
+        // showMenu();
     }
 
 
