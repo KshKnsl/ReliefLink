@@ -1356,6 +1356,7 @@ private:
     void showAdminMenu()
     {
         animatePrint("adminMenu.txt");
+        while(true){
         cout << "\nAdmin Menu:" << endl;
         cout << "1. Add Disaster" << endl;
         cout << "2. Update Disaster" << endl;
@@ -1412,6 +1413,7 @@ private:
             break;
         default:
             cout << RED << "Invalid choice, please try again." << RESET << endl;
+        }
         }
     }
     void showRescueTeamMenu()
@@ -1692,10 +1694,9 @@ public:
         while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
             disasters->insert(D);
             currentDisasterId=max(currentDisasterId,D->id);
-            cout<<1<<endl;
         }
         file.close();
-        disasters->printTree();
+        // disasters->printTree();
         while (true)
         {
             if (isLoggedIn == 0)
