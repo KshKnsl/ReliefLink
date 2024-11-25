@@ -1,0 +1,2 @@
+Location: AttributeSector 62, Disaster Type: fire, Severity: 5, Contact No.11111111
+Location: Botanical Garden, Disaster Type: fire, Severity: 4, Contact No.3323232323
