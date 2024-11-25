@@ -1514,61 +1514,64 @@ private:
         animatePrint("adminMenu.txt");
         while(true){
         cout << "\nAdmin Menu:" << endl;
-        cout << "1. Add Disaster" << endl;
-        cout << "2. Update Disaster" << endl;
-        cout << "3. Delete Disaster" << endl;
-        cout << "4. Display Disaster" << endl;
-        cout << "5. Add Rescue Team" << endl;
-        cout << "6. Update Rescue Team" << endl;
-        cout << "7. Delete Rescue Team" << endl;
-        cout << "8. Add Relief Camp" << endl;
-        cout << "9. Update Relief Camp" << endl;
-        cout << "10. Delete Relief Camp" << endl;
-        cout << "11. Search Relief Camp" << endl;
-        cout << "12. Display All Relief Camps" << endl;
-        cout << "13. Logout" << endl;
+        cout << "1. Display Requests" << endl;
+        cout << "2. Add Disaster" << endl;
+        cout << "3. Update Disaster" << endl;
+        cout << "4. Delete Disaster" << endl;
+        cout << "5. Display Disaster" << endl;
+        cout << "6. Add Rescue Team" << endl;
+        cout << "7. Update Rescue Team" << endl;
+        cout << "8. Delete Rescue Team" << endl;
+        cout << "9. Add Relief Camp" << endl;
+        cout << "10. Update Relief Camp" << endl;
+        cout << "11. Delete Relief Camp" << endl;
+        cout << "12. Search Relief Camp" << endl;
+        cout << "13. Display All Relief Camps" << endl;
+        cout << "14. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
         {
         case 1:
+        displayRequests();
+        break;
+        case 2:
             addDisaster();
             break;
-        case 2:
+        case 3:
             updateDisaster();
             break;
-        case 3:
+        case 4:
             // disasters->remove(1);
             break;
-        case 4:
+        case 5:
             disasters->printTree();
             break;
-        // case 4:
+        // case 6:
         //     addRescueTeam();
         //     break;
-        // case 5:
+        // case 7:
         //     updateRescueTeam();
         //     break;
-        // case 6:
+        // case 8:
         //     deleteRescueTeam();
         //     break;
-        // case 7:
+        // case 9:
         //     addReliefCamp();
         //     break;
-        // case 8:
+        // case 10:
         //     updateReliefCamp();
         //     break;
-        // case 9:
+        // case 11:
         //     deleteReliefCamp();
         //     break;
-        // case 10:
+        // case 12:
         //     searchReliefCamp();
         //     break;
-
-        // case 11:
+        // case 13:
         //     displayAllReliefCamps();
         //     break;
-        case 12:
+        case 14:
             isLoggedIn = 0;
             break;
         default:
@@ -1577,6 +1580,18 @@ private:
         if(isLoggedIn==0){
             break;
         }
+        }
+    }
+    void displayRequests()
+    {
+        // read the file request.txt completely
+        ifstream file;
+        cout<<"Requests:"<<endl;
+        file.open("request.txt");
+        string line;
+        while (getline(file, line))
+        {
+            cout << line << endl;
         }
     }
     void showRescueTeamMenu()
@@ -1710,7 +1725,21 @@ private:
         int op;
         cin >> op;
         location = suggestions[op-1];
-
+        cout<< "Enter Disaster Type: ";
+        string type;
+        cin >> type;
+        cout << "Enter Disaster Severity: ";
+        int severity;
+        cin >> severity;
+        cout << "Enter Contact Number: ";
+        string contact;
+        cin >> contact;
+        ofstream file;
+        file.open("request.txt", ios::app);
+        file << "Location: " << location << ", Disaster Type: " << type << ", Severity: " << severity << ", Contact No."<< contact<<endl;
+        file.close();
+cout << "Help requested successfully!" << endl;
+        cout<< "Will reach you out soon!!"<<endl;
         vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
         if (!path.empty())
         {
@@ -1723,6 +1752,7 @@ private:
             }
             cout << endl;
         }
+        showMenu();
     }
 
 
