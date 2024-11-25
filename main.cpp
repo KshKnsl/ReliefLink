@@ -524,13 +524,13 @@ private:
     {
         if (node != nullptr)
         {
-            for (const T *key : node->keys)
+            for (auto key : node->keys)
             {
                 file.write(reinterpret_cast<char *>(key),sizeof(Disaster));
             }
             for (Node *child : node->children)
             {
-                printTree(child, level + 1,file);
+                AddToFile(child, level + 1,file);
             }
         }
     }
@@ -610,9 +610,10 @@ public:
     }
     void AddToFile(){
         fstream file;
-        file.open("Disaster.dat", ios::out | ios::binary);
+        file.open("Disasters.dat", ios::out | ios::binary);
         AddToFile(root, 0, file);
         file.close();
+        cout<<2<<endl;
     }
 };
 
@@ -1716,14 +1717,15 @@ public:
     }
     void run(){
         fstream file;
-        file.open("Disaster.dat", ios::out | ios::binary);
-        file.close();
         file.open("Disasters.dat",ios::in | ios::binary);
         Disaster *D=new Disaster;
         while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
             disasters->insert(D);
+            cout<<1<<endl;
         }
         file.close();
+        disasters->printTree();
+        showAdminMenu();
         while (true)
         {
             if (isLoggedIn == 0)
@@ -1790,6 +1792,7 @@ public:
                 }
             }
         }
+        disasters->AddToFile();
     }
 };
 
