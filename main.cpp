@@ -864,7 +864,7 @@ private:
     }
     void showAdminMenu()
     {
-        changeColor();
+        animatePrint("adminMenu.txt");
         cout << "\nAdmin Menu:" << endl;
         cout << "1. Add Disaster" << endl;
         cout << "2. Update Disaster" << endl;
@@ -925,6 +925,7 @@ private:
     }
     void showRescueTeamMenu()
     {
+        animatePrint("rescueMenu.txt");
         cout << "\nRescue Team Menu:" << endl;
         cout << "1. View Active Disasters" << endl;
         cout << "2. Respond to Alert Calls" << endl;
@@ -949,6 +950,7 @@ private:
     }
     void showCitizenMenu()
     {
+        animatePrint("Help.txt");
         cout << "\nCitizen Help Menu:" << endl;
         cout << "1. Request Help" << endl;
         cout << "2. Exit" << endl;
