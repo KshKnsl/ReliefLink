@@ -642,7 +642,9 @@ public:
 
         while (!pq.empty())
         {
-            auto [currentDist, current] = *pq.begin();
+            auto currentPair = *pq.begin();
+            int currentDist = currentPair.first;
+            string current = currentPair.second;
             pq.erase(pq.begin());
 
             if (current == end)
