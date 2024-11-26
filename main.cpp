@@ -203,19 +203,22 @@ ostream &operator<<(ostream &os, const Disaster *D)
     return os;
 }
 
-class Team {
+class Team
+{
 private:
     int id;
     string skillset;
     string location;
     string status;
+
 public:
-    Team(){};
-    Team(int id,string skillset,string location, string status){
-        this->id=id;
-        this->skillset=skillset;
-        this->location=location;
-        this->status=status;
+    Team() {};
+    Team(int id, string skillset, string location, string status)
+    {
+        this->id = id;
+        this->skillset = skillset;
+        this->location = location;
+        this->status = status;
     }
     friend class RescueTeamManager;
     template <typename T>
@@ -224,14 +227,12 @@ public:
 };
 ostream &operator<<(ostream &os, const Team *T)
 {
-    os << "Team ID: " << T->id<<endl;
-    os<< "Skillset: " << T->skillset<<endl;
-    os<< "Location: " << T->location<<endl;
-    os<< "Status: " << T->status << endl;
+    os << "Team ID: " << T->id << endl;
+    os << "Skillset: " << T->skillset << endl;
+    os << "Location: " << T->location << endl;
+    os << "Status: " << T->status << endl;
     return os;
 }
-
-
 
 template <typename T>
 class HashTable
@@ -287,7 +288,7 @@ public:
         }
     }
 
-    T* Search(int k)
+    T *Search(int k)
     {
         int pos = Hash(k);
         int i = 1;
@@ -317,15 +318,19 @@ public:
             i++;
         }
     }
-    void Display(){
-        for(auto k:V){
-            if(k!=NULL)
-                cout<<k<<endl;
+    void Display()
+    {
+        for (auto k : V)
+        {
+            if (k != NULL)
+                cout << k << endl;
         }
     }
-    void HashToFile(fstream &file){
-        for(auto k:V){
-            file.write(reinterpret_cast<char *>(k),sizeof(Team));
+    void HashToFile(fstream &file)
+    {
+        for (auto k : V)
+        {
+            file.write(reinterpret_cast<char *>(k), sizeof(Team));
         }
     }
 };
@@ -402,55 +407,75 @@ private:
     }
 
     // Implementation of remove function
-    void remove(Node *node, int key) {
-        if (node->isLeaf) {
+    void remove(Node *node, int key)
+    {
+        if (node->isLeaf)
+        {
             auto it = std::find_if(node->keys.begin(), node->keys.end(),
-                                   [key](const T *obj) { return obj->id == key; });
-            if (it != node->keys.end()) {
+                                   [key](const T *obj)
+                                   { return obj->id == key; });
+            if (it != node->keys.end())
+            {
                 node->keys.erase(it);
             }
-        } 
-        else {
+        }
+        else
+        {
             int idx = std::lower_bound(node->keys.begin(), node->keys.end(), key,
-                                       [](const T *a, int b) { return a->id < b; }) -
+                                       [](const T *a, int b)
+                                       { return a->id < b; }) -
                       node->keys.begin();
 
-            if (idx < node->keys.size() && node->keys[idx]->id == key) {
-                if (node->children[idx]->keys.size() >= t) {
+            if (idx < node->keys.size() && node->keys[idx]->id == key)
+            {
+                if (node->children[idx]->keys.size() >= t)
+                {
                     Node *predNode = node->children[idx];
-                    while (!predNode->isLeaf) {
+                    while (!predNode->isLeaf)
+                    {
                         predNode = predNode->children.back();
                     }
                     T *pred = predNode->keys.back();
                     node->keys[idx] = pred;
                     remove(node->children[idx], pred->id);
-                } 
-                else if (node->children[idx + 1]->keys.size() >= t) {
+                }
+                else if (node->children[idx + 1]->keys.size() >= t)
+                {
                     Node *succNode = node->children[idx + 1];
-                    while (!succNode->isLeaf) {
+                    while (!succNode->isLeaf)
+                    {
                         succNode = succNode->children.front();
                     }
                     T *succ = succNode->keys.front();
                     node->keys[idx] = succ;
                     remove(node->children[idx + 1], succ->id);
-                } 
-                else {
+                }
+                else
+                {
                     merge(node, idx);
                     remove(node->children[idx], key);
                 }
-            } 
-            else {
-                if (node->children[idx]->keys.size() < t) {
-                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t) {
+            }
+            else
+            {
+                if (node->children[idx]->keys.size() < t)
+                {
+                    if (idx > 0 && node->children[idx - 1]->keys.size() >= t)
+                    {
                         borrowFromPrev(node, idx);
-                    } 
-                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t) {
+                    }
+                    else if (idx < node->children.size() - 1 && node->children[idx + 1]->keys.size() >= t)
+                    {
                         borrowFromNext(node, idx);
-                    } 
-                    else {
-                        if (idx < node->children.size() - 1) {
+                    }
+                    else
+                    {
+                        if (idx < node->children.size() - 1)
+                        {
                             merge(node, idx);
-                        } else {
+                        }
+                        else
+                        {
                             merge(node, idx - 1);
                         }
                     }
@@ -644,46 +669,35 @@ public:
     }
 };
 
-// Graph class to represent locations and routes
 class Graph
 {
 private:
-    map<string, vector<pair<string, int>>> adjList; // Adjacency list: location -> [(neighbor, weight)]
+    map<string, vector<pair<string, double>>> adjList;
 
 public:
-    // Add a new location (node) to the graph
     void addNode(const string &location)
     {
         if (adjList.find(location) == adjList.end())
         {
             adjList[location] = {};
-            cout << "Added location: " + location << endl;
-        }
-        else
-        {
-            cout << "Location already exists: " + location << endl;
         }
     }
 
-    // Add a route (edge) between two locations with a distance (weight)
-    void addEdge(const string &from, const string &to, int distance)
+    void addEdge(const string &from, const string &to, double distance)
     {
         adjList[from].push_back({to, distance});
-        adjList[to].push_back({from, distance}); // Assuming undirected graph
-        cout << "Added edge from " + from + " to " + to + " with distance " + to_string(distance) << endl;
+        adjList[to].push_back({from, distance});
     }
 
-    // Dijkstra's algorithm to find shortest path between two locations
     vector<string> dijkstra(const string &start, const string &end)
     {
-        unordered_map<string, int> distances;
+        unordered_map<string, double> distances;
         unordered_map<string, string> previous;
-        set<pair<int, string>> pq; // Min-heap: (distance, location)
+        set<pair<double, string>> pq;
 
-        // Initialize distances to infinity
         for (const auto &node : adjList)
         {
-            distances[node.first] = numeric_limits<int>::max();
+            distances[node.first] = numeric_limits<double>::max();
         }
         distances[start] = 0;
         pq.insert({0, start});
@@ -691,7 +705,7 @@ public:
         while (!pq.empty())
         {
             auto currentPair = *pq.begin();
-            int currentDist = currentPair.first;
+            double currentDist = currentPair.first;
             string current = currentPair.second;
             pq.erase(pq.begin());
 
@@ -701,7 +715,7 @@ public:
             for (const auto &neighbor : adjList[current])
             {
                 string next = neighbor.first;
-                int weight = neighbor.second;
+                double weight = neighbor.second;
 
                 if (distances[current] + weight < distances[next])
                 {
@@ -713,8 +727,9 @@ public:
             }
         }
 
-        // Reconstruct the shortest path
         vector<string> path;
+        cout<<endl;
+        cout << "Shortest Distance To Relief Camp: "<<distances[end]<<endl;
         for (string at = end; !at.empty(); at = previous[at])
         {
             path.push_back(at);
@@ -723,23 +738,21 @@ public:
         return (path.size() > 1) ? path : vector<string>{};
     }
 
-    // Print graph for debugging
     void printGraph()
     {
-        cout << "Graph structure:" << endl;
         for (const auto &node : adjList)
         {
-            string output = node.first + " -> ";
+            cout << node.first << " -> ";
             for (const auto &neighbor : node.second)
             {
-                output += "(" + neighbor.first + ", " + to_string(neighbor.second) + ") ";
+                cout << "(" << neighbor.first << ", " << neighbor.second << ") ";
             }
-            cout << output << endl;
+            cout << endl;
         }
     }
 };
 
-// RoutingSystem class to interact with Graph for path calculations
+// RoutingSystem class
 class RoutingSystem
 {
 private:
@@ -751,7 +764,7 @@ public:
         graph.addNode(location);
     }
 
-    void addRoute(const string &from, const string &to, int distance)
+    void addRoute(const string &from, const string &to, double distance)
     {
         graph.addEdge(from, to, distance);
     }
@@ -761,9 +774,52 @@ public:
         return graph.dijkstra(start, end);
     }
 
-    void updateGraph()
+    bool loadGraphFromCSV(const string &filename, int startLine) // Changed to bool
     {
-        cout << "Graph updated successfully!" << endl;
+        ifstream file(filename);
+        if (!file.is_open())
+        {
+            cout << "Error: Unable to open file: " << filename << endl;
+            return false;
+        }
+
+        string line;
+        int currentLine = 0;
+
+        while (getline(file, line))
+        {
+            currentLine++;
+            if (currentLine < startLine)
+                continue;
+
+            stringstream ss(line);
+            string from, to, distanceStr;
+            double distance;
+
+            getline(ss, from, ',');
+            getline(ss, to, ',');
+            getline(ss, distanceStr);
+
+            if (from.empty() || to.empty() || distanceStr.empty())
+            {
+                cout << "Error: Invalid format in line " << currentLine << endl;
+                continue;
+            }
+
+            try
+            {
+                distance = stod(distanceStr);
+                addRoute(from, to, distance);
+            }
+            catch (const invalid_argument &e)
+            {
+                cout << "Error: Non-numeric distance in line " << currentLine << endl;
+                continue;
+            }
+        }
+
+        file.close();
+        return true;
     }
 
     void printGraph()
@@ -771,7 +827,6 @@ public:
         graph.printGraph();
     }
 };
-
 // RescueTeam class to manage rescue teams
 class RescueTeam
 {
@@ -913,7 +968,6 @@ public:
         cout << "Alert sent successfully for DisasterID " << disasterID << "!" << endl;
     }
 
-
     void updateAlert(int disasterID, int severity, const string &message, const string &time)
     {
         vector<Alert> temp;
@@ -1047,7 +1101,6 @@ public:
 class Trie
 {
 private:
-    
     TrieNode *root;
     void dfsHelper(TrieNode *node, string prefix, vector<string> &results)
     {
@@ -1066,10 +1119,10 @@ public:
     Trie() : root(new TrieNode()) {}
     void insertCsvtoTrie(Trie *trie, const string &filename)
     {
-        int i=0;
+        int i = 0;
         ifstream file(filename);
-        string allData,line;
-        while (i<180 && getline(file, line))
+        string allData, line;
+        while (i < 180 && getline(file, line))
         {
             allData += line;
         }
@@ -1138,7 +1191,8 @@ private:
     }
 };
 
-struct Shelter {
+struct Shelter
+{
     string name;
     int capacity;
     int available_space;
@@ -1149,20 +1203,23 @@ struct Shelter {
         : name(n), capacity(cap), available_space(avail), latitude(lat), longitude(lon) {}
 };
 
-struct KDNode {
+struct KDNode
+{
     Shelter shelter;
-    KDNode* left;
-    KDNode* right;
+    KDNode *left;
+    KDNode *right;
 
     KDNode(Shelter s) : shelter(s), left(nullptr), right(nullptr) {}
 };
 
-class KDTree {
+class KDTree
+{
 private:
-    KDNode* root;
+    KDNode *root;
     const string filename = "shelter.txt";
 
-    KDNode* insertRec(KDNode* node, Shelter shelter, unsigned depth) {
+    KDNode *insertRec(KDNode *node, Shelter shelter, unsigned depth)
+    {
         if (!node)
             return new KDNode(shelter);
 
@@ -1175,77 +1232,95 @@ private:
         return node;
     }
 
-    double distance(double lat1, double lon1, double lat2, double lon2) {
+    double distance(double lat1, double lon1, double lat2, double lon2)
+    {
         return sqrt(pow(lat1 - lat2, 2) + pow(lon1 - lon2, 2));
     }
 
-    void searchNearestRec(KDNode* node, double lat, double lon, unsigned depth, KDNode*& best, double& bestDist) {
+    void searchNearestRec(KDNode *node, double lat, double lon, unsigned depth, KDNode *&best, double &bestDist)
+    {
         if (!node)
             return;
 
         double d = distance(lat, lon, node->shelter.latitude, node->shelter.longitude);
-        if (d < bestDist) {
+        if (d < bestDist)
+        {
             bestDist = d;
             best = node;
         }
 
         unsigned cd = depth % 2;
-        KDNode* nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
-            ? node->left
-            : node->right;
-        KDNode* otherBranch = (nextBranch == node->left) ? node->right : node->left;
+        KDNode *nextBranch = (cd == 0 && lat < node->shelter.latitude) || (cd == 1 && lon < node->shelter.longitude)
+                                 ? node->left
+                                 : node->right;
+        KDNode *otherBranch = (nextBranch == node->left) ? node->right : node->left;
 
         searchNearestRec(nextBranch, lat, lon, depth + 1, best, bestDist);
 
         if ((cd == 0 && fabs(lat - node->shelter.latitude) < bestDist) ||
-            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist)) {
+            (cd == 1 && fabs(lon - node->shelter.longitude) < bestDist))
+        {
             searchNearestRec(otherBranch, lat, lon, depth + 1, best, bestDist);
         }
     }
 
-    KDNode* searchRec(KDNode* node, const string& name) {
+    KDNode *searchRec(KDNode *node, const string &name)
+    {
         if (!node)
             return nullptr;
 
         if (node->shelter.name == name)
             return node;
 
-        KDNode* leftResult = searchRec(node->left, name);
+        KDNode *leftResult = searchRec(node->left, name);
         if (leftResult)
             return leftResult;
 
         return searchRec(node->right, name);
     }
-     KDNode* findMin(KDNode* node, unsigned d, unsigned depth) {
-        if (!node) return nullptr;
+    KDNode *findMin(KDNode *node, unsigned d, unsigned depth)
+    {
+        if (!node)
+            return nullptr;
 
         unsigned cd = depth % 2;
-        if (cd == d) {
-            if (!node->left) return node;
+        if (cd == d)
+        {
+            if (!node->left)
+                return node;
             return findMin(node->left, d, depth + 1);
         }
 
-        KDNode* leftMin = findMin(node->left, d, depth + 1);
-        KDNode* rightMin = findMin(node->right, d, depth + 1);
+        KDNode *leftMin = findMin(node->left, d, depth + 1);
+        KDNode *rightMin = findMin(node->right, d, depth + 1);
 
-        KDNode* minNode = node;
-        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude) minNode = leftMin;
-        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude) minNode = rightMin;
+        KDNode *minNode = node;
+        if (leftMin && leftMin->shelter.latitude < minNode->shelter.latitude)
+            minNode = leftMin;
+        if (rightMin && rightMin->shelter.latitude < minNode->shelter.latitude)
+            minNode = rightMin;
 
         return minNode;
     }
 
-    KDNode* deleteRec(KDNode* node, const string& name, unsigned depth) {
-        if (!node) return nullptr;
+    KDNode *deleteRec(KDNode *node, const string &name, unsigned depth)
+    {
+        if (!node)
+            return nullptr;
 
-        if (node->shelter.name == name) {
-            if (!node->right) return node->left;
-            if (!node->left) return node->right;
+        if (node->shelter.name == name)
+        {
+            if (!node->right)
+                return node->left;
+            if (!node->left)
+                return node->right;
 
-            KDNode* minNode = findMin(node->right, depth % 2, depth + 1);
+            KDNode *minNode = findMin(node->right, depth % 2, depth + 1);
             node->shelter = minNode->shelter;
             node->right = deleteRec(node->right, minNode->shelter.name, depth + 1);
-        } else {
+        }
+        else
+        {
             unsigned cd = depth % 2;
             if ((cd == 0 && name < node->shelter.name) || (cd == 1 && name < node->shelter.name))
                 node->left = deleteRec(node->left, name, depth + 1);
@@ -1254,7 +1329,8 @@ private:
         }
         return node;
     }
-    void displaySheltersRec(KDNode* node) {
+    void displaySheltersRec(KDNode *node)
+    {
         if (!node)
             return;
 
@@ -1266,8 +1342,10 @@ private:
         displaySheltersRec(node->left);
         displaySheltersRec(node->right);
     }
-    void saveToFileRec(KDNode* node, ofstream& outfile) {
-        if (!node) return;
+    void saveToFileRec(KDNode *node, ofstream &outfile)
+    {
+        if (!node)
+            return;
 
         outfile << node->shelter.name << ","
                 << node->shelter.capacity << ","
@@ -1279,9 +1357,11 @@ private:
         saveToFileRec(node->right, outfile);
     }
 
-    void loadFromFileRec(ifstream& infile) {
+    void loadFromFileRec(ifstream &infile)
+    {
         string line;
-        while (getline(infile, line)) {
+        while (getline(infile, line))
+        {
             stringstream ss(line);
             string name;
             int capacity, available_space;
@@ -1300,39 +1380,46 @@ private:
             addShelter(shelter);
         }
     }
+
 public:
-    KDTree() : root(nullptr) {
+    KDTree() : root(nullptr)
+    {
         loadData();
     }
 
-    void loadData() {
+    void loadData()
+    {
         ifstream infile(filename);
-        if (!infile.is_open()) throw runtime_error("Could not open file for loading.");
+        if (!infile.is_open())
+            throw runtime_error("Could not open file for loading.");
         loadFromFileRec(infile);
         infile.close();
-        
     }
 
-    void saveData() {
-       ofstream outfile(filename);
-        if (!outfile.is_open()) throw runtime_error("Could not open file for saving.");
+    void saveData()
+    {
+        ofstream outfile(filename);
+        if (!outfile.is_open())
+            throw runtime_error("Could not open file for saving.");
         saveToFileRec(root, outfile);
         outfile.close();
     }
-  Shelter searchShelterByName(const string &name)
+    Shelter searchShelterByName(const string &name)
     {
         KDNode *node = searchRec(root, name);
         if (!node)
             throw runtime_error("Shelter not found.");
         return node->shelter;
     }
-    
-    void addShelter(Shelter shelter) {
+
+    void addShelter(Shelter shelter)
+    {
         root = insertRec(root, shelter, 0);
     }
 
-    void updateShelter(const string& name, int newCapacity, int newAvailableSpace) {
-        KDNode* node = searchRec(root, name);
+    void updateShelter(const string &name, int newCapacity, int newAvailableSpace)
+    {
+        KDNode *node = searchRec(root, name);
         if (!node)
             throw runtime_error("Shelter not found.");
         node->shelter.capacity = newCapacity;
@@ -1340,13 +1427,15 @@ public:
         saveData();
     }
 
-    void deleteShelter(const string& name) {
+    void deleteShelter(const string &name)
+    {
         root = deleteRec(root, name, 0);
         saveData();
     }
 
-    Shelter searchNearestShelter(double lat, double lon) {
-        KDNode* best = nullptr;
+    Shelter searchNearestShelter(double lat, double lon)
+    {
+        KDNode *best = nullptr;
         double bestDist = numeric_limits<double>::max();
         searchNearestRec(root, lat, lon, 0, best, bestDist);
         if (best)
@@ -1354,25 +1443,29 @@ public:
         throw runtime_error("No shelter found.");
     }
 
-    int getAvailableSpace(const string& name) {
-        KDNode* node = searchRec(root, name);
+    int getAvailableSpace(const string &name)
+    {
+        KDNode *node = searchRec(root, name);
         if (!node)
             throw runtime_error("Shelter not found.");
         return node->shelter.available_space;
     }
 
-    pair<double, double> getLocation(const string& name) {
-        KDNode* node = searchRec(root, name);
+    pair<double, double> getLocation(const string &name)
+    {
+        KDNode *node = searchRec(root, name);
         if (!node)
             throw runtime_error("Shelter not found.");
         return {node->shelter.latitude, node->shelter.longitude};
     }
 
-    void displayShelters() {
+    void displayShelters()
+    {
         displaySheltersRec(root);
     }
 };
-void getAvailableSpaceForShelter(KDTree &tree) {
+void getAvailableSpaceForShelter(KDTree &tree)
+{
     string name;
     cout << "Enter the shelter name: ";
     cin >> name;
@@ -1380,8 +1473,8 @@ void getAvailableSpaceForShelter(KDTree &tree) {
     cout << "Available space for " << name << ": " << availableSpace << endl;
 }
 
-
-void getLocationForShelter(KDTree &tree) {
+void getLocationForShelter(KDTree &tree)
+{
     string name;
     cout << "Enter the shelter name: ";
     cin >> name;
@@ -1389,7 +1482,8 @@ void getLocationForShelter(KDTree &tree) {
     cout << "Location of " << name << ": (" << location.first << ", " << location.second << ")" << endl;
 }
 
-void searchNearestShelter(KDTree &tree) {
+void searchNearestShelter(KDTree &tree)
+{
     double latitude, longitude;
     cout << "Enter latitude: ";
     cin >> latitude;
@@ -1420,11 +1514,12 @@ void searchShelterByNameFunction(KDTree &tree)
     }
 }
 
-void insertShelter(KDTree& tree) {
+void insertShelter(KDTree &tree)
+{
     string name;
     int capacity, available_space;
     double latitude, longitude;
-cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter Shelter Name: ";
     getline(cin, name);
     cout << "Enter Capacity: ";
@@ -1435,14 +1530,15 @@ cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin >> latitude;
     cout << "Enter Longitude: ";
     cin >> longitude;
-    cin.ignore();  // Ignore newline character after cin
+    cin.ignore(); // Ignore newline character after cin
 
     Shelter shelter(name, capacity, available_space, latitude, longitude);
     tree.addShelter(shelter);
     cout << "Shelter added successfully.\n";
 }
 
-void updateShelter(KDTree& tree) {
+void updateShelter(KDTree &tree)
+{
     string name;
     int newCapacity, newAvailableSpace;
 
@@ -1454,45 +1550,53 @@ void updateShelter(KDTree& tree) {
     cin >> newAvailableSpace;
     cin.ignore();
 
-    try {
+    try
+    {
         tree.updateShelter(name, newCapacity, newAvailableSpace);
         cout << "Shelter updated successfully.\n";
     }
-    catch (const runtime_error& e) {
+    catch (const runtime_error &e)
+    {
         cout << e.what() << endl;
     }
 }
 
-void deleteShelter(KDTree& tree) {
+void deleteShelter(KDTree &tree)
+{
     string name;
 
     cout << "Enter Shelter Name to delete: ";
     getline(cin, name);
 
-    try {
+    try
+    {
         tree.deleteShelter(name);
         cout << "Shelter deleted successfully.\n";
     }
-    catch (const runtime_error& e) {
+    catch (const runtime_error &e)
+    {
         cout << e.what() << endl;
     }
 }
 
-void displayShelters(KDTree& tree) {
+void displayShelters(KDTree &tree)
+{
     cout << "\nList of Shelters:\n";
     tree.displayShelters();
 }
 
-
-class RescueTeamManager {
+class RescueTeamManager
+{
 private:
     HashTable<Team> *team;
-    AlertManager*alert;
-//  Helper function to append a single team's data to the file
-    void saveTeamToFile(){
+    AlertManager *alert;
+    //  Helper function to append a single team's data to the file
+    void saveTeamToFile()
+    {
         fstream file;
-        file.open("RescueTeam.txt",ios::out | ios::binary);
-        if (!file) {
+        file.open("RescueTeam.txt", ios::out | ios::binary);
+        if (!file)
+        {
             cout << "Error opening file for writing.\n";
             return;
         }
@@ -1502,17 +1606,20 @@ private:
     }
 
 public:
-    RescueTeamManager(){
-        team=new HashTable<Team>(20);
-        alert=new AlertManager;
+    RescueTeamManager()
+    {
+        team = new HashTable<Team>(20);
+        alert = new AlertManager;
     }
     // Function to add a new rescue team
-    void addRescueTeam(int teamID, const string& skillset, const string& location) {
-        Team *T=team->Search(teamID);
-            if (T != NULL) {
-                cout << "Team with ID " << teamID << " already exists. Cannot add duplicate team.\n";
-                return;
-            }
+    void addRescueTeam(int teamID, const string &skillset, const string &location)
+    {
+        Team *T = team->Search(teamID);
+        if (T != NULL)
+        {
+            cout << "Team with ID " << teamID << " already exists. Cannot add duplicate team.\n";
+            return;
+        }
 
         // Add the team to the vector
         Team *newTeam = new Team(teamID, skillset, location, "Active");
@@ -1520,63 +1627,70 @@ public:
         cout << "Rescue team added successfully.\n";
     }
 
-    void addRescueTeam(Team *R) {
+    void addRescueTeam(Team *R)
+    {
         // Add the team to the vector
         team->Insert(R);
         cout << "Rescue team added successfully.\n";
     }
 
     // Function to display all rescue teams
-    void displayTeams() const {
+    void displayTeams() const
+    {
         cout << "\nRescue Teams:\n";
         team->Display();
     }
 
     // Function to delete a rescue team
-    void deleteRescueTeam(int teamID) {
-        Team * T=team->Search(teamID);
-            if (T!=NULL) {
-                if (T->status == "Removed") {
-                    cout << "Team with ID " << teamID << " is already removed.\n";
-                    return;
-                }
-                T->status = "Removed";
-                cout << "Rescue team with ID " << teamID << " has been removed.\n";
+    void deleteRescueTeam(int teamID)
+    {
+        Team *T = team->Search(teamID);
+        if (T != NULL)
+        {
+            if (T->status == "Removed")
+            {
+                cout << "Team with ID " << teamID << " is already removed.\n";
                 return;
             }
+            T->status = "Removed";
+            cout << "Rescue team with ID " << teamID << " has been removed.\n";
+            return;
+        }
         cout << "No team found with ID " << teamID << ".\n";
     }
 
     // Function to update a rescue team's details
-    void updateRescueTeam(int teamID, const string& newSkillset, const string& newLocation) {
-        Team * T=team->Search(teamID);
-            if (T!=NULL) {
-                if (T->status == "Removed") {
-                    cout << "Team with ID " << teamID << " is already removed.\n";
-                    return;
-                }
-                T->skillset = newSkillset;
-                T->location = newLocation;
-                cout << "Rescue team with ID " << teamID << " has been updated.\n";
+    void updateRescueTeam(int teamID, const string &newSkillset, const string &newLocation)
+    {
+        Team *T = team->Search(teamID);
+        if (T != NULL)
+        {
+            if (T->status == "Removed")
+            {
+                cout << "Team with ID " << teamID << " is already removed.\n";
                 return;
             }
+            T->skillset = newSkillset;
+            T->location = newLocation;
+            cout << "Rescue team with ID " << teamID << " has been updated.\n";
+            return;
+        }
         cout << "No team found with ID " << teamID << ".\n";
     }
-    void DisplayAlert(){
+    void DisplayAlert()
+    {
         alert->displayAlerts();
-            }
+    }
     friend class DisasterManagementSystem;
 };
-
-
 
 class DisasterManagementSystem
 {
 private:
-    KDTree tree;    
+    KDTree tree;
     BPlusTree<Disaster> *disasters;
-    RescueTeamManager * Rescue;
-    AlertManager * alert;
+    RescueTeamManager *Rescue;
+    AlertManager *alert;
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
@@ -1626,121 +1740,127 @@ private:
     void showAdminMenu()
     {
         animatePrint("adminMenu.txt");
-        while(true){
-        cout << "\nAdmin Menu:" << endl;
-        cout << "1. Display Requests" << endl;
-        cout << "2. Add Disaster" << endl;
-        cout << "3. Update Disaster" << endl;
-        cout << "4. Delete Disaster" << endl;
-        cout << "5. Display Disaster" << endl;
-        cout << "6. Add Rescue Team" << endl;
-        cout << "7. Update Rescue Team" << endl;
-        cout << "8. Delete Rescue Team" << endl;
-        cout << "9. Display Rescue Team" << endl;
-        cout << "10. Add Relief Camp" << endl;
-        cout << "11. Update Relief Camp" << endl;
-        cout << "12. Delete Relief Camp" << endl;
-        cout << "13. Search Relief Camp" << endl;
-        cout << "14. Display All Relief Camps" << endl;
-        cout << "15. Display Alerts" << endl;
-        cout << "16. Logout" << endl;
-        int adminChoice;
-        cin >> adminChoice;
-        switch (adminChoice)
+        while (true)
         {
-        case 1:
-        displayRequests();
-        break;
-        case 2:
-            addDisaster();
-            break;
-        case 3:
-            updateDisaster();
-            break;
-        case 4:
-            DeleteDisaster();
-            break;
-        case 5:
-            disasters->printTree();
-            break;
-        case 6:
-            addRescueTeam();
-            break;
-        case 7:
-            updateRescueTeam();
-            break;
-        case 8:
-            deleteRescueTeam();
-            break;
-        case 9:
-            Rescue->displayTeams();
-            break;
-        case 10:
-            insertShelter(tree);
-            break;
-        case 11:
-            updateShelter(tree);
-            break;
-        case 12:
-            deleteShelter(tree);
-            break;
-        case 13:
-            searchShelterByNameFunction(tree);
-            break;
-        case 14:
-            displayShelters(tree);
-            break;
-        case 15:
-            displayalerts();
-        break;
-        case 16:
-            isLoggedIn = 0;
-            break;
-        default:
-            cout << RED << "Invalid choice, please try again." << RESET << endl;
-        }
-        if(isLoggedIn==0){
-            break;
-        }
+            cout << "\nAdmin Menu:" << endl;
+            cout << "1. Display Requests" << endl;
+            cout << "2. Add Disaster" << endl;
+            cout << "3. Update Disaster" << endl;
+            cout << "4. Delete Disaster" << endl;
+            cout << "5. Display Disaster" << endl;
+            cout << "6. Add Rescue Team" << endl;
+            cout << "7. Update Rescue Team" << endl;
+            cout << "8. Delete Rescue Team" << endl;
+            cout << "9. Display Rescue Team" << endl;
+            cout << "10. Add Relief Camp" << endl;
+            cout << "11. Update Relief Camp" << endl;
+            cout << "12. Delete Relief Camp" << endl;
+            cout << "13. Search Relief Camp" << endl;
+            cout << "14. Display All Relief Camps" << endl;
+            cout << "15. Display Alerts" << endl;
+            cout << "16. Logout" << endl;
+            int adminChoice;
+            cin >> adminChoice;
+            switch (adminChoice)
+            {
+            case 1:
+                displayRequests();
+                break;
+            case 2:
+                addDisaster();
+                break;
+            case 3:
+                updateDisaster();
+                break;
+            case 4:
+                DeleteDisaster();
+                break;
+            case 5:
+                disasters->printTree();
+                break;
+            case 6:
+                addRescueTeam();
+                break;
+            case 7:
+                updateRescueTeam();
+                break;
+            case 8:
+                deleteRescueTeam();
+                break;
+            case 9:
+                Rescue->displayTeams();
+                break;
+            case 10:
+                insertShelter(tree);
+                break;
+            case 11:
+                updateShelter(tree);
+                break;
+            case 12:
+                deleteShelter(tree);
+                break;
+            case 13:
+                searchShelterByNameFunction(tree);
+                break;
+            case 14:
+                displayShelters(tree);
+                break;
+            case 15:
+                displayalerts();
+                break;
+            case 16:
+                isLoggedIn = 0;
+                break;
+            default:
+                cout << RED << "Invalid choice, please try again." << RESET << endl;
+            }
+            if (isLoggedIn == 0)
+            {
+                break;
+            }
         }
     }
-    void displayalerts(){
+    void displayalerts()
+    {
         alert->displayAlerts();
     }
-    void addRescueTeam(){
+    void addRescueTeam()
+    {
         int id;
-        string skillset,location;
-        cout<<"Enter the Rescue Team ID: ";
-        cin>>id;
-        cout<<"Enter the Rescue Team skillset: ";
-        cin>>skillset;
-        cout<<"Location under Rescue Team: ";
-        cin>>location;
-        Rescue->addRescueTeam(id,skillset,location);
+        string skillset, location;
+        cout << "Enter the Rescue Team ID: ";
+        cin >> id;
+        cout << "Enter the Rescue Team skillset: ";
+        cin >> skillset;
+        cout << "Location under Rescue Team: ";
+        cin >> location;
+        Rescue->addRescueTeam(id, skillset, location);
     }
-    void updateRescueTeam(){
+    void updateRescueTeam()
+    {
         int id;
-        string skillset,location;
-        cout<<"Enter the Rescue Team ID: ";
-        cin>>id;
-        cout<<"Enter the Rescue Team New Skillset: ";
-        cin>>skillset;
-        cout<<"New Location under Rescue Team: ";
-        cin>>location;
-        Rescue->updateRescueTeam(id,skillset,location);
+        string skillset, location;
+        cout << "Enter the Rescue Team ID: ";
+        cin >> id;
+        cout << "Enter the Rescue Team New Skillset: ";
+        cin >> skillset;
+        cout << "New Location under Rescue Team: ";
+        cin >> location;
+        Rescue->updateRescueTeam(id, skillset, location);
     }
-    void deleteRescueTeam(){
+    void deleteRescueTeam()
+    {
         int id;
-        string skillset,location;
-        cout<<"Enter the Rescue Team ID to be deleted: ";
-        cin>>id;
+        string skillset, location;
+        cout << "Enter the Rescue Team ID to be deleted: ";
+        cin >> id;
         Rescue->deleteRescueTeam(id);
     }
     void displayRequests()
     {
         // read the file request.txt completely
         ifstream file;
-        cout<<"Requests:"<<endl;
+        cout << "Requests:" << endl;
         file.open("request.txt");
         string line;
         while (getline(file, line))
@@ -1773,25 +1893,33 @@ private:
             cout << RED << "Invalid choice, please try again." << RESET << endl;
         }
     }
-    void showCitizenMenu()
+    void showCitizenMenu(RoutingSystem &routingSystem)
     {
         animatePrint("Help.txt");
         cout << "\nCitizen Help Menu:" << endl;
         cout << "1. Request Help" << endl;
-        cout << "2. Exit" << endl;
+        cout << "2. View Graph" << endl;
+        cout << "3. Exit" << endl;
+
         int citizenChoice;
         cin >> citizenChoice;
+
         switch (citizenChoice)
         {
         case 1:
-            requestHelp();
+            requestHelp(routingSystem);
             break;
         case 2:
+            routingSystem.printGraph();
+            break;
+        case 3:
+            cout << "Exiting Citizen Menu. Stay safe!" << endl;
             break;
         default:
-            cout << RED << "Invalid choice, please try again." << RESET << endl;
+            cout << "Invalid choice, please try again." << endl;
         }
     }
+
     void addDisaster()
     {
         string type, status, date, address, city, state;
@@ -1801,10 +1929,10 @@ private:
         cout << "Enter Disaster Type: ";
         cin >> type;
         cout << "Enter Status: ";
-                cin.ignore();
+        cin.ignore();
         cin >> status;
         cout << "Enter Date (YYYY-MM-DD): ";
-                cin.ignore();
+        cin.ignore();
         cin >> date;
         cout << "Enter Location (latitude longitude): ";
         cin >> lat >> lon;
@@ -1815,7 +1943,7 @@ private:
         cin.ignore();
         getline(cin, city);
         cout << "Enter State: ";
-                cin.ignore();
+        cin.ignore();
         getline(cin, state);
         cout << "Enter Severity (1-5): ";
         cin >> severity;
@@ -1850,7 +1978,6 @@ private:
         disasters->printTree();
     }
 
-    
     void respondToAlertCalls()
     {
         if (alertQueue.empty())
@@ -1862,13 +1989,49 @@ private:
         alertQueue.pop();
         cout << "Responding to alert call for Disaster ID: " << alert.second << endl;
     }
-void requestHelp()
+    // void requestHelp()
+    //     {
+    //         string location;
+    //         cout << "Enter your location: ";
+    //         getline(cin, location);
+    //         getline(cin, location);
+    //         vector<string> suggestions = trie.autocomplete(location);
+    //         if (suggestions.empty())
+    //         {
+    //             cout << "No suggestions found for your location." << endl;
+    //             return;
+    //         }
+    //         cout << "Did you mean:" << endl;
+    //         int sugg = 1;
+    //         for (const string &suggestion : suggestions)
+    //         {
+    //             cout << sugg++ << "." << suggestion << endl;
+    //         }
+    //         vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
+    //         // converting path to string
+    //         string pathString = "";
+    //         for (int i = 0; i < path.size(); i++)
+    //         {
+    //             pathString += path[i];
+    //             if (i < path.size() - 1)
+    //                 pathString += " -> ";
+    //         }
+
+    //     }
+
+    void requestHelp(RoutingSystem &routingSystem)
     {
+        if (!routingSystem.loadGraphFromCSV("noida_city_graph.csv", 200))
+        {
+            cout << "Failed to load graph data. Cannot proceed with the request." << endl;
+            return;
+        }
         trie.insertCsvtoTrie(&trie, "noida_city_graph.csv");
+
         string location;
         cout << "Enter your location: ";
         getline(cin, location);
-        getline(cin, location);
+        getline(cin, location); // To handle newline issue after previous input
         vector<string> suggestions = trie.autocomplete(location);
         if (suggestions.empty())
         {
@@ -1879,53 +2042,51 @@ void requestHelp()
         int sugg = 1;
         for (const string &suggestion : suggestions)
         {
-            cout << sugg++ << "." << suggestion << endl;
+            cout << sugg++ << ". " << suggestion << endl;
         }
+        cout << "Enter the location number from suggestions: ";
+        cin>> sugg;
+        location = suggestions[sugg-1];
         vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
-        // converting path to string
+        if (path.empty())
+        {
+            cout << "No path found from " << location << " to Relief Camp." << endl;
+            return;
+        }
+
         string pathString = "";
-        for (int i = 0; i < path.size(); i++)
+        for (size_t i = 0; i < path.size(); i++)
         {
             pathString += path[i];
             if (i < path.size() - 1)
                 pathString += " -> ";
         }
-        
-        cout << "Enter the correct location no: ";
-        int op;
-        cin >> op;
-        location = suggestions[op - 1];
+
+        cout << "Shortest path: " << pathString << endl;
+
         cout << "Enter Disaster Type: ";
         string type;
         cin >> type;
+
         cout << "Enter Disaster Severity: ";
         int severity;
         cin >> severity;
+
         cout << "Enter Contact Number: ";
         string contact;
         cin >> contact;
-        ofstream file;
-        if (!path.empty())
-        {
-            cout << "Help is on the way! Shortest path: ";
-            for (size_t i = 0; i < path.size(); ++i)
-            {
-                cout << path[i];
-                if (i < path.size() - 1)
-                    cout << " -> ";
-            }
-            cout << endl;
-        }
-        file.open("request.txt", ios::app);
-        file << "Location: " << location << ", Disaster Type: " << type << ", Severity: " << severity << ", Contact No." << contact << pathString<<endl;
 
-        file.close();
+        ofstream file("request.txt", ios::app);
+        if (file.is_open())
+        {
+            file << "Location: " << location << ", Disaster Type: " << type
+                 << ", Severity: " << severity << ", Contact No.: " << contact
+                 << ", Path: " << pathString << endl;
+            file.close();
+        }
         cout << "Help requested successfully!" << endl;
         cout << "Will reach you out soon!!" << endl;
-        
-        // showMenu();
     }
-
 
     void viewAllDisasters()
     {
@@ -2056,7 +2217,7 @@ void requestHelp()
         cout << "Enter team ID to assign: ";
         cin >> teamId;
         // Will change according to rescue team
-        if (Rescue->team->Search(teamId)==NULL)
+        if (Rescue->team->Search(teamId) == NULL)
         {
             cout << RED << "Invalid team ID." << RESET << endl;
             return;
@@ -2083,7 +2244,7 @@ void requestHelp()
 public:
     DisasterManagementSystem() : currentDisasterId(0), currentTeamId(1), currentShelterId(1), currentEquipmentId(1), isLoggedIn(false)
     {
-        Rescue=new RescueTeamManager;
+        Rescue = new RescueTeamManager;
         disasters = new BPlusTree<Disaster>(5);
         loadUsers();
         loadRescueUsers();
@@ -2091,18 +2252,20 @@ public:
     void run()
     {
         fstream file;
-        file.open("Disasters.txt",ios::in | ios::binary);
-        Disaster *D=new Disaster;
-        while(file.read(reinterpret_cast<char *>(D),sizeof(Disaster))){
+        file.open("Disasters.txt", ios::in | ios::binary);
+        Disaster *D = new Disaster;
+        while (file.read(reinterpret_cast<char *>(D), sizeof(Disaster)))
+        {
             // cout<<&*D;
             disasters->insert(D);
-            currentDisasterId=max(currentDisasterId,D->id);
+            currentDisasterId = max(currentDisasterId, D->id);
         }
         currentDisasterId++;
         file.close();
-        file.open("RescueTeam.txt",ios::in | ios::binary);
-        Team *R=new Team;
-        while(file.read(reinterpret_cast<char *>(R),sizeof(Team))){
+        file.open("RescueTeam.txt", ios::in | ios::binary);
+        Team *R = new Team;
+        while (file.read(reinterpret_cast<char *>(R), sizeof(Team)))
+        {
             Rescue->addRescueTeam(R);
         }
         file.close();
@@ -2160,7 +2323,7 @@ public:
                 }
                 else if (choice == 3)
                 {
-                    showCitizenMenu();
+                    showCitizenMenu(routingSystem);
                 }
                 else if (choice == 4)
                 {
@@ -2177,8 +2340,6 @@ public:
         tree.saveData();
     }
 };
-
-
 
 int main()
 {
@@ -2212,9 +2373,9 @@ int main()
     //     Alert alert = alertHeap.extractMax();
     //     cout << "Processing: " << alert << endl;
     // }
-    animatePrint("Logo.txt");
-    animatePrint("Welcome.txt");
-    KDTree tree; 
+    // animatePrint("Logo.txt");
+    // animatePrint("Welcome.txt");
+    KDTree tree;
     DisasterManagementSystem dms;
     dms.run();
     animatePrint("Thanks.txt");
