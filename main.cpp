@@ -1636,13 +1636,14 @@ private:
         cout << "6. Add Rescue Team" << endl;
         cout << "7. Update Rescue Team" << endl;
         cout << "8. Delete Rescue Team" << endl;
-        cout << "9. Add Relief Camp" << endl;
-        cout << "10. Update Relief Camp" << endl;
-        cout << "11. Delete Relief Camp" << endl;
-        cout << "12. Search Relief Camp" << endl;
-        cout << "13. Display All Relief Camps" << endl;
-        cout << "14. Display Alerts" << endl;
-        cout << "15. Logout" << endl;
+        cout << "9. Display Rescue Team" << endl;
+        cout << "10. Add Relief Camp" << endl;
+        cout << "11. Update Relief Camp" << endl;
+        cout << "12. Delete Relief Camp" << endl;
+        cout << "13. Search Relief Camp" << endl;
+        cout << "14. Display All Relief Camps" << endl;
+        cout << "15. Display Alerts" << endl;
+        cout << "16. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
@@ -1672,24 +1673,27 @@ private:
             deleteRescueTeam();
             break;
         case 9:
-            insertShelter(tree);
+            Rescue->displayTeams();
             break;
         case 10:
-            updateShelter(tree);
+            insertShelter(tree);
             break;
         case 11:
-            deleteShelter(tree);
+            updateShelter(tree);
             break;
         case 12:
-            searchShelterByNameFunction(tree);
+            deleteShelter(tree);
             break;
         case 13:
-            displayShelters(tree);
+            searchShelterByNameFunction(tree);
             break;
         case 14:
+            displayShelters(tree);
+            break;
+        case 15:
             displayalerts();
         break;
-        case 15:
+        case 16:
             isLoggedIn = 0;
             break;
         default:
