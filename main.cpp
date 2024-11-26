@@ -1740,84 +1740,94 @@ private:
     void showAdminMenu()
     {
         animatePrint("adminMenu.txt");
-        while (true)
+        while(true){
+        cout << "\nAdmin Menu:" << endl;
+        cout << "1. Display Requests" << endl;
+        cout << "2. Add Disaster" << endl;
+        cout << "3. Update Disaster" << endl;
+        cout << "4. Delete Disaster" << endl;
+        cout << "5. Display Disaster" << endl;
+        cout << "6. Add Rescue Team" << endl;
+        cout << "7. Update Rescue Team" << endl;
+        cout << "8. Delete Rescue Team" << endl;
+        cout << "9. Display Rescue Team" << endl;
+        cout << "10. Add Relief Camp" << endl;
+        cout << "11. Update Relief Camp" << endl;
+        cout << "12. Delete Relief Camp" << endl;
+        cout << "13. Search Relief Camp" << endl;
+        cout << "14. Display All Relief Camps" << endl;
+        cout << "15. Get the available space left in shelter" << endl;
+        cout << "16. Search nearest shelter" << endl;
+        cout << "17. Get location of shelter" << endl;
+        cout << "18. Display Alerts" << endl;
+        cout << "19. Logout" << endl;
+        int adminChoice;
+        cin >> adminChoice;
+        switch (adminChoice)
         {
-            cout << "\nAdmin Menu:" << endl;
-            cout << "1. Display Requests" << endl;
-            cout << "2. Add Disaster" << endl;
-            cout << "3. Update Disaster" << endl;
-            cout << "4. Delete Disaster" << endl;
-            cout << "5. Display Disaster" << endl;
-            cout << "6. Add Rescue Team" << endl;
-            cout << "7. Update Rescue Team" << endl;
-            cout << "8. Delete Rescue Team" << endl;
-            cout << "9. Display Rescue Team" << endl;
-            cout << "10. Add Relief Camp" << endl;
-            cout << "11. Update Relief Camp" << endl;
-            cout << "12. Delete Relief Camp" << endl;
-            cout << "13. Search Relief Camp" << endl;
-            cout << "14. Display All Relief Camps" << endl;
-            cout << "15. Display Alerts" << endl;
-            cout << "16. Logout" << endl;
-            int adminChoice;
-            cin >> adminChoice;
-            switch (adminChoice)
-            {
-            case 1:
-                displayRequests();
-                break;
-            case 2:
-                addDisaster();
-                break;
-            case 3:
-                updateDisaster();
-                break;
-            case 4:
-                DeleteDisaster();
-                break;
-            case 5:
-                disasters->printTree();
-                break;
-            case 6:
-                addRescueTeam();
-                break;
-            case 7:
-                updateRescueTeam();
-                break;
-            case 8:
-                deleteRescueTeam();
-                break;
-            case 9:
-                Rescue->displayTeams();
-                break;
-            case 10:
-                insertShelter(tree);
-                break;
-            case 11:
-                updateShelter(tree);
-                break;
-            case 12:
-                deleteShelter(tree);
-                break;
-            case 13:
-                searchShelterByNameFunction(tree);
-                break;
-            case 14:
-                displayShelters(tree);
-                break;
-            case 15:
-                displayalerts();
-                break;
-            case 16:
-                isLoggedIn = 0;
-                break;
-            default:
-                cout << RED << "Invalid choice, please try again." << RESET << endl;
-            }
-            if (isLoggedIn == 0)
-            {
-                break;
-            }
+        case 1:
+        displayRequests();
+        break;
+        case 2:
+            addDisaster();
+            break;
+        case 3:
+            updateDisaster();
+            break;
+        case 4:
+            DeleteDisaster();
+            break;
+        case 5:
+            disasters->printTree();
+            break;
+        case 6:
+            addRescueTeam();
+            break;
+        case 7:
+            updateRescueTeam();
+            break;
+        case 8:
+            deleteRescueTeam();
+            break;
+        case 9:
+            Rescue->displayTeams();
+            break;
+        case 10:
+            insertShelter(tree);
+            break;
+        case 11:
+            updateShelter(tree);
+            break;
+        case 12:
+            deleteShelter(tree);
+            break;
+        case 13:
+            searchShelterByNameFunction(tree);
+            break;
+        case 14:
+            displayShelters(tree);
+            break;
+        case 15:
+            getAvailableSpaceForShelter(tree);
+        break;
+        case 16:
+            searchNearestShelter(tree);
+        break;
+        case 17:
+            getLocationForShelter(tree);
+        break;
+        case 18:
+            displayalerts();
+        break;
+        case 19:
+            isLoggedIn = 0;
+            break;
+        default:
+            cout << RED << "Invalid choice, please try again." << RESET << endl;
+        }
+        if(isLoggedIn==0){
+            break;
+        }
         }
     }
     void displayalerts()
