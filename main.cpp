@@ -1862,13 +1862,13 @@ private:
         alertQueue.pop();
         cout << "Responding to alert call for Disaster ID: " << alert.second << endl;
     }
-    void requestHelp()
+void requestHelp()
     {
         trie.insertCsvtoTrie(&trie, "noida_city_graph.csv");
         string location;
         cout << "Enter your location: ";
-        getline(cin,location);
-        getline(cin,location);
+        getline(cin, location);
+        getline(cin, location);
         vector<string> suggestions = trie.autocomplete(location);
         if (suggestions.empty())
         {
@@ -1876,16 +1876,26 @@ private:
             return;
         }
         cout << "Did you mean:" << endl;
-        int sugg=1;
+        int sugg = 1;
         for (const string &suggestion : suggestions)
         {
-            cout << sugg++ <<"."<< suggestion << endl;
+            cout << sugg++ << "." << suggestion << endl;
         }
+        vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
+        // converting path to string
+        string pathString = "";
+        for (int i = 0; i < path.size(); i++)
+        {
+            pathString += path[i];
+            if (i < path.size() - 1)
+                pathString += " -> ";
+        }
+        
         cout << "Enter the correct location no: ";
         int op;
         cin >> op;
-        location = suggestions[op-1];
-        cout<< "Enter Disaster Type: ";
+        location = suggestions[op - 1];
+        cout << "Enter Disaster Type: ";
         string type;
         cin >> type;
         cout << "Enter Disaster Severity: ";
@@ -1895,12 +1905,6 @@ private:
         string contact;
         cin >> contact;
         ofstream file;
-        file.open("request.txt", ios::app);
-        file << "Location: " << location << ", Disaster Type: " << type << ", Severity: " << severity << ", Contact No."<< contact<<endl;
-        file.close();
-cout << "Help requested successfully!" << endl;
-        cout<< "Will reach you out soon!!"<<endl;
-        vector<string> path = routingSystem.calculateOptimalPath(location, "Relief Camp");
         if (!path.empty())
         {
             cout << "Help is on the way! Shortest path: ";
@@ -1912,6 +1916,13 @@ cout << "Help requested successfully!" << endl;
             }
             cout << endl;
         }
+        file.open("request.txt", ios::app);
+        file << "Location: " << location << ", Disaster Type: " << type << ", Severity: " << severity << ", Contact No." << contact << pathString<<endl;
+
+        file.close();
+        cout << "Help requested successfully!" << endl;
+        cout << "Will reach you out soon!!" << endl;
+        
         // showMenu();
     }
 
