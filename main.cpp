@@ -319,7 +319,8 @@ public:
     }
     void Display(){
         for(auto k:V){
-            cout<<k<<endl;
+            if(k!=NULL)
+                cout<<k<<endl;
         }
     }
     void HashToFile(fstream &file){
@@ -1303,10 +1304,6 @@ public:
         loadData();
     }
 
-    ~KDTree() {
-        saveData();
-    }
-
     void loadData() {
         ifstream infile(filename);
         if (!infile.is_open()) throw runtime_error("Could not open file for loading.");
@@ -1575,6 +1572,7 @@ public:
 class DisasterManagementSystem
 {
 private:
+    KDTree tree;    
     BPlusTree<Disaster> *disasters;
     RescueTeamManager * Rescue;
     map<string, City> cities;
@@ -1625,7 +1623,6 @@ private:
     }
     void showAdminMenu()
     {
-        KDTree tree;
         animatePrint("adminMenu.txt");
         while(true){
         cout << "\nAdmin Menu:" << endl;
@@ -1657,7 +1654,7 @@ private:
             updateDisaster();
             break;
         case 4:
-            // disasters->remove(1);
+            DeleteDisaster();
             break;
         case 5:
             disasters->printTree();
@@ -1839,6 +1836,8 @@ private:
         cout << "\nActive Disasters:" << endl;
         disasters->printTree();
     }
+
+    
     void respondToAlertCalls()
     {
         if (alertQueue.empty())
@@ -1990,6 +1989,27 @@ cout << "Help requested successfully!" << endl;
         cout << GREEN << "Status Updated Successfully!" << RESET << endl;
     }
 
+    void DeleteDisaster()
+    {
+        if (disasters == NULL)
+        {
+            cout << RED << "No disasters to assign teams to." << RESET << endl;
+            return;
+        }
+        int disasterId;
+        cout << "Enter Disaster ID to Delete: ";
+        cin >> disasterId;
+        Disaster *find = disasters->search(disasterId);
+        if (find == NULL)
+        {
+            cout << RED << "Invalid disaster ID." << RESET << endl;
+            return;
+        }
+
+        disasters->remove(disasterId);
+        cout << GREEN << "Disaster Deleted Successfully!" << RESET << endl;
+    }
+
     void assignTeams()
     {
         if (disasters == NULL)
@@ -2129,6 +2149,8 @@ public:
             }
         }
         disasters->AddToFile();
+        Rescue->saveTeamToFile();
+        tree.saveData();
     }
 };
 
