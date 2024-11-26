@@ -8,3 +8,4 @@ Location: Sector 44, Disaster Type: 12, Severity: 12, Contact No.: 12, Path: Sec
 Location: Sector 93, Disaster Type: sds, Severity: 1, Contact No.: 1121, Path: Sector 93 -> Relief Camp
 Location: Sector 40, Disaster Type: a, Severity: 1, Contact No.: 1121, Path: Sector 40 -> Relief Camp
 Location: Apollo Hospital Noida, Disaster Type: asas, Severity: 1, Contact No.: 12121, Path: Apollo Hospital Noida -> Sector 41 -> Sector 65 -> Relief Camp
+Location: Apollo Hospital Noida, Disaster Type: add, Severity: 1, Contact No.: 34434323, Path: Apollo Hospital Noida -> Sector 41 -> Sector 65 -> Relief Camp

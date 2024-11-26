@@ -1756,11 +1756,8 @@ private:
         cout << "12. Delete Relief Camp" << endl;
         cout << "13. Search Relief Camp" << endl;
         cout << "14. Display All Relief Camps" << endl;
-        cout << "15. Get the available space left in shelter" << endl;
-        cout << "16. Search nearest shelter" << endl;
-        cout << "17. Get location of shelter" << endl;
-        cout << "18. Display Alerts" << endl;
-        cout << "19. Logout" << endl;
+        cout << "15. Display Alerts" << endl;
+        cout << "16. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
@@ -1808,18 +1805,9 @@ private:
             displayShelters(tree);
             break;
         case 15:
-            getAvailableSpaceForShelter(tree);
-        break;
-        case 16:
-            searchNearestShelter(tree);
-        break;
-        case 17:
-            getLocationForShelter(tree);
-        break;
-        case 18:
             displayalerts();
         break;
-        case 19:
+        case 16:
             isLoggedIn = 0;
             break;
         default:
