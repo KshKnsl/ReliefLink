@@ -955,6 +955,7 @@ public:
         }
     }
     friend class RescueTeamManager;
+    friend class DisasterManagementSystem;
 };
 
 class MaxHeap
@@ -1577,6 +1578,7 @@ class DisasterManagementSystem
 private:
     BPlusTree<Disaster> *disasters;
     RescueTeamManager * Rescue;
+    AlertManager * alert;
     map<string, City> cities;
     map<int, Equipment> equipment;
     priority_queue<pair<int, int>> alertQueue; // Disaster severity queue
@@ -1642,7 +1644,8 @@ private:
         cout << "11. Delete Relief Camp" << endl;
         cout << "12. Search Relief Camp" << endl;
         cout << "13. Display All Relief Camps" << endl;
-        cout << "14. Logout" << endl;
+        cout << "14. Display Alerts" << endl;
+        cout << "15. Logout" << endl;
         int adminChoice;
         cin >> adminChoice;
         switch (adminChoice)
@@ -1687,6 +1690,9 @@ private:
             displayShelters(tree);
             break;
         case 14:
+            displayalerts();
+        break;
+        case 15:
             isLoggedIn = 0;
             break;
         default:
@@ -1696,6 +1702,9 @@ private:
             break;
         }
         }
+    }
+    void displayalerts(){
+        alert->displayAlerts();
     }
     void addRescueTeam(){
         int id;
@@ -2166,8 +2175,8 @@ int main()
     //     Alert alert = alertHeap.extractMax();
     //     cout << "Processing: " << alert << endl;
     // }
-    // animatePrint("Logo.txt");
-    // animatePrint("Welcome.txt");
+    animatePrint("Logo.txt");
+    animatePrint("Welcome.txt");
     KDTree tree; 
     DisasterManagementSystem dms;
     dms.run();

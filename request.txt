@@ -1,3 +1,4 @@
 Location: AttributeSector 62, Disaster Type: fire, Severity: 5, Contact No.11111111
 Location: Botanical Garden, Disaster Type: fire, Severity: 4, Contact No.3323232323
 Location: Apollo Hospital Noida, Disaster Type: wdwd, Severity: 2, Contact No.23232323
+Location: AttributeSector 62, Disaster Type: Earthquake, Severity: 3, Contact No.9999999999
